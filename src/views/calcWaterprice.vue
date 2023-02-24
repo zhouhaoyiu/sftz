@@ -1,5 +1,19 @@
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { type Ref, ref, onMounted } from "vue";
+
+import * as xlsx from "xlsx"; //引入
+
+const importFile = (file: File) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = e.target?.result;
+    const workbook = xlsx.read(data, { type: "binary" });
+    const sheetNames = workbook.SheetNames;
+    const worksheet = workbook.Sheets[sheetNames[0]];
+    console.log(worksheet);
+  };
+  reader.readAsBinaryString(file);
+};
 
 const waterTypeEnum: Record<any, any>[] = [
   // 1: '生活用水',
@@ -104,7 +118,7 @@ const getWaterPrice = (
   }
 };
 
-let waterPriceList: Ref<Record<string, number>[]> = ref([
+let waterPriceList: Ref<Record<string, any>[]> = ref([
   {
     waterType: 2,
     waterNumber: 0,
@@ -120,34 +134,96 @@ let waterPriceList: Ref<Record<string, number>[]> = ref([
  * currentNumber           本次指数
  * lastNumber              上次指数
  * latestPaymentDate       最迟缴费日期
- * userTotalUse            总用量
+ * userPopulation          用户人数
  * userPhone               用户电话
  * userWx                  用户微信
+ * waterClassification     用水分类
  */
 
 let userInfo: Ref<Record<string, any>> = ref({
-  userId: "",
+  userId: 0,
   userHh: "",
   jfyf: "",
   userName: "",
   userAddress: "",
-  currentNumber: "",
-  lastNumber: "",
+  currentNumber: 0,
+  lastNumber: 0,
   latestPaymentDate: "",
-  userTotalUse: "",
+  userPopulation: 0,
   userPhone: "",
   userWx: "",
+  waterClassification: 0,
+  userTotalUse: 0,
 });
 
-let calcNumber = () => {
-  let currentNumber = userInfo.value.currentNumber;
-  let lastNumber = userInfo.value.lastNumber;
-  userInfo.value.userTotalUse = currentNumber - lastNumber;
+// 总水费
+let userTotalPrice: Ref<number> = ref(0);
+
+const mockGetUser = {
+  userId: 1,
+  userHh: "123456",
+  jfyf: "2023-02",
+  userName: "张三",
+  userAddress: "北京市海淀区",
+  currentNumber: 0,
+  lastNumber: 123,
+  latestPaymentDate: "2023-03-15",
+  userPopulation: 3,
+  userPhone: "12345678901",
+  userWx: "zhangsan",
+  waterClassification: "居民一,生活一",
+};
+
+onMounted(async () => {
+  waterPriceList.value = mockGetUser.waterClassification
+    .split(",")
+    .map((item) => {
+      // : waterTypeEnum.forEach((item2) => {
+      //     if (item2.label === item) {
+      //       console.log(item2.value);
+      //       return item2.value;
+      //     }
+      //   }),
+      return {
+        waterType: waterTypeEnum.find((item2) => item2.label === item)?.value,
+        waterNumber: 0,
+        population: mockGetUser.userPopulation,
+      };
+    });
+  console.log(waterPriceList.value);
+
+  importFile(new File([""], "./sftzd.xlsx"));
+});
+
+let calcWaterPriceAndWrite = () => {
+  let waterPrice = 0;
+  let totalUse = 0;
+  waterPrice = waterPriceList.value.reduce(
+    (total, waterPrice) =>
+      total +
+      Math.round(
+        getWaterPrice(
+          waterTypeEnum[waterPrice.waterType].label,
+          waterPrice.waterNumber,
+          waterPrice.population
+        ) * 100
+      ) /
+        100,
+    0
+  );
+  totalUse = waterPriceList.value.reduce(
+    (total, waterPrice) => total + waterPrice.waterNumber,
+    0
+  );
+  userInfo.value.userTotalUse = totalUse;
+  // 本次指数 = 上次指数 + 本次用水量
+  userInfo.value.currentNumber = userInfo.value.lastNumber + totalUse;
+  userTotalPrice.value = waterPrice;
 };
 
 const fetchUserInfo = async () => {
   const res = await fetch(
-    `http://localhost:7001/user/get_user?userHh=${userInfo.value.userHh}`
+    `http://192.168.88.4:7001/user/get_user?userHh=${userInfo.value.userHh}`
   );
   const data = await res.json();
   console.log(data);
@@ -158,6 +234,15 @@ const fetchUserInfo = async () => {
 <template>
   <div class="userInfo">
     <h2>信息查询</h2>
+    <!-- 导入excel文件 -->
+    <div>
+      <label for="importFile">导入excel文件</label>
+      <input
+        type="file"
+        id="importFile"
+        @change="importFile($event.target.files[0])"
+      />
+    </div>
     <div>
       <label for="population">户号</label>
       <el-input
@@ -174,45 +259,49 @@ const fetchUserInfo = async () => {
         v-model="userInfo.jfyf"
         type="month"
         placeholder="选择月份"
-        style="width: 100px"
+        style="width: 150px"
       />
     </div>
     <div>
       <!-- 用户名 -->
       <label for="userName">用户名</label>
-      <el-input
+      <!-- <el-input
         v-model="userInfo.userName"
         id="userName"
         style="width: 100px"
-      />
+      /> -->
+      {{ userInfo.userName || "请输入户号后查询" }}
     </div>
     <div style="display: flex; align-items: center">
       <!-- 地址 -->
       <label for="userAddress">地址</label>
-      <el-input
+      <!-- <el-input
         type="textarea"
         v-model="userInfo.userAddress"
         id="userAddress"
         style="width: 150px"
-      />
+      /> -->
+      {{ userInfo.userAddress || "请输入户号后查询" }}
     </div>
     <div>
       <!-- 本次指数 -->
       <label for="currentNumber">本次指数</label>
-      <el-input
+      <!-- <el-input
         v-model="userInfo.currentNumber"
         id="currentNumber"
         style="width: 100px"
-      />
+      /> -->
+      {{ userInfo.currentNumber }}
     </div>
     <div>
       <!-- 上次指数 -->
       <label for="lastNumber">上次指数</label>
-      <el-input
+      <!-- <el-input
         v-model="userInfo.lastNumber"
         id="lastNumber"
         style="width: 100px"
-      />
+      /> -->
+      {{ userInfo.lastNumber }}
     </div>
     <div>
       <!-- 最迟缴费日期 -->
@@ -228,29 +317,38 @@ const fetchUserInfo = async () => {
       <!-- 总用量 -->
       <label for="userTotalUse">总用量</label>
       <el-input
-        v-model="userInfo.userTotalUse"
+        disabled
+        :model-value="userInfo.userTotalUse || 0"
         id="userTotalUse"
         style="width: 150px"
       />
     </div>
     <div>
+      <!-- 用户人数 -->
+      <label for="userPopulation">用户人数</label>
+      {{ userInfo.userPopulation }}
+    </div>
+    <div>
       <!-- 用户电话 -->
       <label for="userPhone">用户电话</label>
-      <el-input
+      <!-- <el-input
         v-model="userInfo.userPhone"
         id="userPhone"
         style="width: 150px"
-      />
+      /> -->
+      {{ userInfo.userPhone || "请输入户号后查询" }}
     </div>
 
     <div>
       <!-- 用户微信 -->
       <label for="userWx">用户微信</label>
-      <el-input v-model="userInfo.userWx" id="userWx" style="width: 150px" />
+      <!-- <el-input v-model="userInfo.userWx" id="userWx" style="width: 150px" /> -->
+      {{ userInfo.userWx || "请输入户号后查询" }}
     </div>
-    <div>
-      <el-button type="primary" @click="fetchUserInfo"> 查询 </el-button>
-      <el-button type="primary" @click="calcNumber"> 计算 </el-button>
+    <div class="fetchUserInfo" style="width: 100%">
+      <el-button style="width: 100%" type="primary" @click="fetchUserInfo">
+        查询
+      </el-button>
     </div>
   </div>
   <div class="calcWaterprices">
@@ -284,7 +382,7 @@ const fetchUserInfo = async () => {
         />
       </div>
       <!-- 如果是居民一增加人口数，默认为3 -->
-      <div class="population" v-if="waterPrice.waterType === 2">
+      <!-- <div class="population" v-if="waterPrice.waterType === 2">
         <label for="population">人口数</label>
         <el-input-number
           id="population"
@@ -292,64 +390,99 @@ const fetchUserInfo = async () => {
           :min="0"
           v-model="waterPrice.population"
         />
-      </div>
+      </div> -->
       <div class="waterPrice">
         <div>用水性质：{{ waterTypeEnum[waterPrice.waterType].label }}</div>
         <div>用水量：{{ waterPrice.waterNumber }}</div>
         <div>
-          水费：
-          {{
-            // 避免出现小数点后面很多位
-            Math.round(
-              getWaterPrice(
-                waterTypeEnum[waterPrice.waterType].label,
-                waterPrice.waterNumber,
-                waterPrice.population
-              ) * 100
-            ) / 100
-          }}
+          <b>
+            水费：
+            {{
+              // 避免出现小数点后面很多位
+              Math.round(
+                getWaterPrice(
+                  waterTypeEnum[waterPrice.waterType].label,
+                  waterPrice.waterNumber,
+                  waterPrice.population
+                ) * 100
+              ) / 100
+            }}
+          </b>
         </div>
       </div>
-      <div class="addWaterPrice">
+      <!-- <div class="addWaterPrice">
         <el-button
           type="danger"
           @click="waterPriceList.splice(waterPriceIndex, 1)"
           >删除
         </el-button>
-      </div>
+      </div> -->
     </div>
     <div>
-      <el-button
+      <!-- <el-button
         type="primary"
         @click="waterPriceList.push({ waterType: 1, waterNumber: 0 })"
         >添加
-      </el-button>
+      </el-button> -->
+      <el-button type="primary" @click="calcWaterPriceAndWrite">计算</el-button>
     </div>
-    <div>
-      总价格：{{
-        waterPriceList.reduce(
-          (total, waterPrice) =>
-            total +
-            Math.round(
-              getWaterPrice(
-                waterTypeEnum[waterPrice.waterType].label,
-                waterPrice.waterNumber,
-                waterPrice.population
-              ) * 100
-            ) /
-              100,
-          0
-        )
-      }}
-    </div>
+    <h1>总水费：{{ userTotalPrice }}</h1>
   </div>
 </template>
 
 <style scoped lang="scss">
+@media (max-width: 768px) {
+  .userInfo {
+    width: 80% !important;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: none !important;
+    border: 1px solid #ebeef570;
+    .fetchUserInfo {
+      width: 100% !important;
+      margin-top: 20px !important;
+      > button {
+        width: 100% !important;
+        height: 40px !important;
+      }
+    }
+  }
+
+  .calcWaterprices {
+    width: 80% !important;
+    // margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: none !important;
+    border: 1px solid #ebeef570;
+    margin-left: 0 !important;
+    .calcWaterprice {
+      flex-direction: column !important;
+      height: max-content !important;
+      align-items: center;
+      border-radius: 24px;
+      padding: 5px;
+      > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100% !important;
+        margin-top: 10px !important;
+        border-radius: 24px;
+      }
+
+      .addWaterPrice {
+        margin-bottom: 20px !important;
+      }
+    }
+  }
+}
 .userInfo {
-  background: azure;
   width: 20%;
+  height: 90%;
   padding: 20px;
+  border-radius: 24px;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  background: #fafafa;
   > div {
     display: flex;
     align-items: center;
@@ -363,8 +496,14 @@ const fetchUserInfo = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px;
-  width: 60%;
+  justify-content: center;
+  padding: 20px;
+  width: 55%;
+  margin-left: 3%;
+  border-radius: 24px;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  background: #fafafa;
+  height: 90%;
   // background: green;
 
   .calcWaterprice {

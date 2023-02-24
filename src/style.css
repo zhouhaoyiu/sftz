@@ -12,6 +12,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* el-primary */
+  --el-color-primary: #2b5cab;
 }
 
 a {
@@ -31,7 +34,7 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 1.5em;
   line-height: 1.1;
 }
 
@@ -64,6 +67,16 @@ button:focus-visible {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
+}
+
+/* 手机适配 */
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+    justify-content: flex-start !important;
+    height: max-content;
+  }
 }
 
 @media (prefers-color-scheme: light) {
