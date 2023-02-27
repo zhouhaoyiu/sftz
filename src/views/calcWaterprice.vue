@@ -1,19 +1,9 @@
 <script lang="ts" setup>
 import { type Ref, ref, onMounted } from "vue";
+// router
+import { useRouter } from "vue-router";
 
-import * as xlsx from "xlsx"; //引入
-
-const importFile = (file: File) => {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const data = e.target?.result;
-    const workbook = xlsx.read(data, { type: "binary" });
-    const sheetNames = workbook.SheetNames;
-    const worksheet = workbook.Sheets[sheetNames[0]];
-    console.log(worksheet);
-  };
-  reader.readAsBinaryString(file);
-};
+const router = useRouter();
 
 const waterTypeEnum: Record<any, any>[] = [
   // 1: '生活用水',
@@ -191,8 +181,6 @@ onMounted(async () => {
       };
     });
   console.log(waterPriceList.value);
-
-  importFile(new File([""], "./sftzd.xlsx"));
 });
 
 let calcWaterPriceAndWrite = () => {
@@ -229,20 +217,26 @@ const fetchUserInfo = async () => {
   console.log(data);
   userInfo.value = data.data;
 };
+
+const print = () => {
+  // 携带props跳转
+  
+
+};
 </script>
 
 <template>
   <div class="userInfo">
     <h2>信息查询</h2>
     <!-- 导入excel文件 -->
-    <div>
+    <!-- <div>
       <label for="importFile">导入excel文件</label>
       <input
         type="file"
         id="importFile"
-        @change="importFile($event.target.files[0])"
+        @change="importFile(($event!.target! as any).files[0])"
       />
-    </div>
+    </div> -->
     <div>
       <label for="population">户号</label>
       <el-input
@@ -427,6 +421,10 @@ const fetchUserInfo = async () => {
       <el-button type="primary" @click="calcWaterPriceAndWrite">计算</el-button>
     </div>
     <h1>总水费：{{ userTotalPrice }}</h1>
+    <div>
+      <!-- 打印 -->
+      <el-button type="primary" @click="print">打印</el-button>
+    </div>
   </div>
 </template>
 

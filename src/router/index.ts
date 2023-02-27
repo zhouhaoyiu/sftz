@@ -12,6 +12,11 @@ const router = createRouter({
       name: "CalcWaterprice",
       component: CalcWaterprice,
     },
+    {
+      path: "/print-page",
+      name: "print-page",
+      component: () => import("../views/printPage.vue"),
+    },
   ],
 });
 
