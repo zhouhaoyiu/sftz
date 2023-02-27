@@ -1,5 +1,6 @@
 <template>
   <div>printpage</div>
+  <el-button @click="$router.push('/calc-waterprice')">back</el-button>
 </template>
 
 <script lang="ts" setup>
@@ -7,10 +8,8 @@ import { useRouter, useRoute } from "vue-router";
 
 const $router = useRouter();
 const $route = useRoute();
-// 打印接收到的param
-
-console.log("printPage", $router);
-console.log("printPage", $route);
+console.log("printPage", $route.query);
+console.log(JSON.parse($route.query.waterPriceList as string));
 </script>
 
 <style lang="scss" scoped></style>

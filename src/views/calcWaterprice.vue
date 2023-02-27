@@ -1,9 +1,15 @@
 <script lang="ts" setup>
-import { type Ref, ref, onMounted } from "vue";
+import { type Ref, ref, onMounted, computed } from "vue";
 // router
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+let isSearch = ref(false);
+let isCalc = ref(false);
+
+let searchAndCalc = computed(() => {
+  return isSearch.value && isCalc.value;
+});
 
 const waterTypeEnum: Record<any, any>[] = [
   // 1: '生活用水',
@@ -181,6 +187,7 @@ onMounted(async () => {
       };
     });
   console.log(waterPriceList.value);
+  console.log(searchAndCalc.value);
 });
 
 let calcWaterPriceAndWrite = () => {
@@ -207,6 +214,7 @@ let calcWaterPriceAndWrite = () => {
   // 本次指数 = 上次指数 + 本次用水量
   userInfo.value.currentNumber = userInfo.value.lastNumber + totalUse;
   userTotalPrice.value = waterPrice;
+  isCalc.value = true;
 };
 
 const fetchUserInfo = async () => {
@@ -216,12 +224,30 @@ const fetchUserInfo = async () => {
   const data = await res.json();
   console.log(data);
   userInfo.value = data.data;
+  isSearch.value = true;
 };
 
 const print = () => {
-  // 携带props跳转
-  
+  router.push({
+    path: "/print-page",
+    query: {
+      userHh: userInfo.value.userHh,
+      jfyf: userInfo.value.jfyf,
+      userName: userInfo.value.userName,
+      userAddress: userInfo.value.userAddress,
+      currentNumber: userInfo.value.currentNumber,
+      lastNumber: userInfo.value.lastNumber,
+      latestPaymentDate: userInfo.value.latestPaymentDate,
+      userPopulation: userInfo.value.userPopulation,
+      userPhone: userInfo.value.userPhone,
+      userWx: userInfo.value.userWx,
+      waterClassification: userInfo.value.waterClassification,
+      userTotalUse: userInfo.value.userTotalUse,
+      userTotalPrice: userTotalPrice.value,
 
+      waterPriceList: JSON.stringify(waterPriceList.value),
+    },
+  });
 };
 </script>
 
@@ -423,7 +449,9 @@ const print = () => {
     <h1>总水费：{{ userTotalPrice }}</h1>
     <div>
       <!-- 打印 -->
-      <el-button type="primary" @click="print">打印</el-button>
+      <el-button v-if="searchAndCalc" type="primary" @click="print">
+        打印
+      </el-button>
     </div>
   </div>
 </template>
