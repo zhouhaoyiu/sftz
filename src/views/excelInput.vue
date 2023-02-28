@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 let excelInfo = ref<any>(null);
 const importExcel = (e: any) => {
   const file = e.target.files[0];
