@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { waterTypeEnum } from "./share";
+// import { waterTypeEnum } from "./share";
 import sftzd from "../assets/sftzd.jpg";
 import html2canvas from "html2canvas";
 
@@ -56,11 +56,11 @@ const $router = useRouter();
 const $route = useRoute();
 console.log("printPage", $route.query);
 console.log(JSON.parse($route.query.waterPriceList as string));
-let waterPriceList = JSON.parse($route.query.waterPriceList as string);
+// let waterPriceList = JSON.parse($route.query.waterPriceList as string);
 
-const waterType = (type: number): string => {
-  return waterTypeEnum[type].label as string;
-};
+// const waterType = (type: number): string => {
+//   return waterTypeEnum[type].label as string;
+// };
 const query = $route.query;
 const exportToImage = () => {
   // printContent

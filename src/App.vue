@@ -1,6 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
+  <left-bar />
   <router-view />
 </template>
 

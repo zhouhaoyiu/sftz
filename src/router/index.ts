@@ -17,6 +17,11 @@ const router = createRouter({
       name: "print-page",
       component: () => import("../views/printPage.vue"),
     },
+    {
+      path: "/excel-input",
+      name: "excel-input",
+      component: () => import("../views/excelInput.vue"),
+    },
   ],
 });
 
