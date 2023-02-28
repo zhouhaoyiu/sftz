@@ -2,6 +2,7 @@
 import { type Ref, ref, onMounted, computed } from "vue";
 // router
 import { useRouter } from "vue-router";
+import { waterTypeEnum, mockGetUser } from "./share";
 
 const router = useRouter();
 let isSearch = ref(false);
@@ -10,44 +11,6 @@ let isCalc = ref(false);
 let searchAndCalc = computed(() => {
   return isSearch.value && isCalc.value;
 });
-
-const waterTypeEnum: Record<any, any>[] = [
-  // 1: '生活用水',
-  // 2: '非居民',
-  // 3: '特种用水',
-  {
-    label: "生活一",
-    value: 0,
-  },
-  {
-    label: "生活二",
-    value: 1,
-  },
-  {
-    label: "居民一",
-    value: 2,
-  },
-  {
-    label: "居民二",
-    value: 3,
-  },
-  {
-    label: "非居民一",
-    value: 4,
-  },
-  {
-    label: "非居民二",
-    value: 5,
-  },
-  {
-    label: "特种一",
-    value: 6,
-  },
-  {
-    label: "非居民四",
-    value: 7,
-  },
-];
 
 /**
  * @param waterType 用水性质
@@ -114,7 +77,7 @@ const getWaterPrice = (
   }
 };
 
-let waterPriceList: Ref<Record<string, any>[]> = ref([
+let waterPriceList: Ref<Record<string, number>[]> = ref([
   {
     waterType: 2,
     waterNumber: 0,
@@ -155,39 +118,16 @@ let userInfo: Ref<Record<string, any>> = ref({
 // 总水费
 let userTotalPrice: Ref<number> = ref(0);
 
-const mockGetUser = {
-  userId: 1,
-  userHh: "123456",
-  jfyf: "2023-02",
-  userName: "张三",
-  userAddress: "北京市海淀区",
-  currentNumber: 0,
-  lastNumber: 123,
-  latestPaymentDate: "2023-03-15",
-  userPopulation: 3,
-  userPhone: "12345678901",
-  userWx: "zhangsan",
-  waterClassification: "居民一,生活一",
-};
-
 onMounted(async () => {
   waterPriceList.value = mockGetUser.waterClassification
     .split(",")
     .map((item) => {
-      // : waterTypeEnum.forEach((item2) => {
-      //     if (item2.label === item) {
-      //       console.log(item2.value);
-      //       return item2.value;
-      //     }
-      //   }),
       return {
         waterType: waterTypeEnum.find((item2) => item2.label === item)?.value,
         waterNumber: 0,
         population: mockGetUser.userPopulation,
       };
     });
-  console.log(waterPriceList.value);
-  console.log(searchAndCalc.value);
 });
 
 let calcWaterPriceAndWrite = () => {
@@ -218,6 +158,8 @@ let calcWaterPriceAndWrite = () => {
 };
 
 const fetchUserInfo = async () => {
+  console.log(userInfo.value);
+
   const res = await fetch(
     `http://192.168.88.4:7001/user/get_user?userHh=${userInfo.value.userHh}`
   );
