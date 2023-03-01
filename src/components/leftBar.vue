@@ -12,6 +12,12 @@
     >
       单独输入
     </el-button>
+    <el-button
+      :type="hilight('manage-info') ? 'primary' : ''"
+      @click="$router.push('/manage-info')"
+    >
+      信息管理
+    </el-button>
   </div>
 </template>
 
@@ -35,7 +41,7 @@ import { useRouter, useRoute } from "vue-router";
 const $router = useRouter();
 const $route = useRoute();
 const hilight = (path: string): boolean => {
-  console.log(path, $route.path === "/" + path);
+  // console.log(path, $route.path === "/" + path);
   return $route.path === "/" + path;
 };
 </script>
@@ -43,6 +49,7 @@ const hilight = (path: string): boolean => {
 <style scoped lang="scss">
 .leftBar {
   width: 200px;
+  min-width: 200px;
   height: 100%;
   margin-right: 100px;
   background-color: #f2f2f2;

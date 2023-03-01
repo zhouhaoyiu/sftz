@@ -22,6 +22,11 @@ const router = createRouter({
       name: "excel-input",
       component: () => import("../views/excelInput.vue"),
     },
+    {
+      path: "/manage-info",
+      name: "manage-info",
+      component: () => import("../views/manageInfo.vue"),
+    },
   ],
 });
 
