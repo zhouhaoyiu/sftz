@@ -161,7 +161,7 @@ const fetchUserInfo = async () => {
   console.log(userInfo.value);
 
   const res = await fetch(
-    `http://192.168.88.4:7001/user/get_user?userHh=${userInfo.value.userHh}`
+    `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`
   );
   const data = await res.json();
   console.log(data);

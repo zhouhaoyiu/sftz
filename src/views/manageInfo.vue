@@ -5,7 +5,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding-top: 40px;
+
       /* justify-content: center; */
       /* align-items: center; */
     "
@@ -73,33 +73,141 @@
       </el-table-column>
     </el-table>
     <el-dialog
+      class="dialog"
       title="编辑"
       v-model="dialogVisible"
-      width="30%"
+      width="60%"
+      top="10vh"
       :before-close="handleClose"
     >
-      <el-input v-model="editForm.userHh" placeholder="户号"></el-input>
-      <el-input v-model="editForm.jfyf" placeholder="缴费月份"></el-input>
-      <el-input v-model="editForm.userName" placeholder="用户名"></el-input>
-      <el-input v-model="editForm.userAddress" placeholder="地址"></el-input>
-      <el-input
-        v-model="editForm.currentNumber"
-        placeholder="本月指数"
-      ></el-input>
-      <el-input v-model="editForm.lastNumber" placeholder="上月指数"></el-input>
-      <el-input v-model="editForm.waterNumber" placeholder="用水量"></el-input>
-      <el-input v-model="editForm.userPhone" placeholder="用户电话"></el-input>
-      <el-input v-model="editForm.userWx" placeholder="用户微信"></el-input>
-      <el-input
-        v-model="editForm.waterClassification"
-        placeholder="用户水性"
-      ></el-input>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
+      <div class="dialogDiv">
+        <label for="userHh">户号</label>
+        <el-input
+          id="userHh"
+          v-model="editForm.userHh"
+          placeholder="户号"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="jfyf">缴费月份</label>
+        <el-input
+          id="jfyf"
+          v-model="editForm.jfyf"
+          placeholder="缴费月份"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="userName">用户名</label>
+        <el-input
+          id="userName"
+          v-model="editForm.userName"
+          placeholder="用户名"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="userAddress">地址</label>
+        <el-input
+          id="userAddress"
+          v-model="editForm.userAddress"
+          placeholder="地址"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="currentNumber">本月指数</label>
+        <el-input
+          id="currentNumber"
+          v-model="editForm.currentNumber"
+          placeholder="本月指数"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="lastNumber">上月指数</label>
+        <el-input
+          id="lastNumber"
+          v-model="editForm.lastNumber"
+          placeholder="上月指数"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="waterNumber">用水量</label>
+        <el-input
+          id="waterNumber"
+          v-model="editForm.waterNumber"
+          placeholder="用水量"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <label for="userPhone">用户电话</label>
+        <el-input
+          id="userPhone"
+          v-model="editForm.userPhone"
+          placeholder="用户电话"
+        ></el-input>
+      </div>
+      <!-- {{ editForm }} -->
+      <div
+        class="dialogDiv"
+        style="display: flex; flex-direction: column; width: 100%"
+      >
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            margin-bottom: 10px;
+            align-items: center;
+          "
+          v-for="(item, index) in editForm.waterClassification"
+          :key="index"
         >
-      </template>
+          <label style="padding-right: 14px" for="waterType">
+            水性{{ index + 1 }}
+          </label>
+          <el-input
+            id="waterType"
+            v-model="item.waterType"
+            placeholder="水性"
+            style="width: 300px; padding-right: 14px"
+          ></el-input>
+          <label style="padding-right: 14px" for="waterNumber"
+            >默认用水量</label
+          >
+          <el-input
+            id="waterNumber"
+            v-model="item.waterNumber"
+            placeholder="默认用水量"
+            style="width: 300px"
+          ></el-input>
+          <el-button
+            type="danger"
+            @click="handleDeleteWaterClassification(index)"
+            style="margin-left: 10px"
+          >
+            删除
+          </el-button>
+        </div>
+        <el-button
+          type="primary"
+          @click="handleAddWaterClassification"
+          style="margin-left: 10px"
+        >
+          添加
+        </el-button>
+      </div>
+      <div class="dialogDiv">
+        <label for="userWx">用户微信</label>
+        <el-input
+          id="userWx"
+          v-model="editForm.userWx"
+          placeholder="用户微信"
+        ></el-input>
+      </div>
+      <div class="dialogDiv">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">
+          确 定
+        </el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -118,11 +226,16 @@ let editForm: Ref<any> = ref({
   waterNumber: "",
   userPhone: "",
   userWx: "",
-  waterClassification: "",
+  waterClassification: [
+    {
+      waterType: "生活一",
+      waterNumber: "0",
+    },
+  ],
 });
 
 onMounted(async () => {
-  const res = await fetch("http://192.168.88.4:7001/user/get_all_user");
+  const res = await fetch("http://192.168.88.109:7001/user/get_all_user");
   const data = await res.json();
   console.log(data.data);
   userInfoArr.value = data.data;
@@ -134,7 +247,7 @@ const handleEdit = (userHh: string) => {
 
   userInfoArr.value.forEach((item) => {
     if (item.userHh === userHh) {
-      editForm.value = item;
+      // editForm.value = item;
     }
   });
 };
@@ -142,6 +255,31 @@ const handleEdit = (userHh: string) => {
 const handleClose = (done: any) => {
   done();
 };
+const defaultWaterNumber = 0;
+
+const handleAddWaterClassification = () => {
+  editForm.value.waterClassification.push({
+    waterType: "",
+    waterNumber: defaultWaterNumber,
+  });
+};
+
+const handleDeleteWaterClassification = (index: number) => {
+  editForm.value.waterClassification.splice(index, 1);
+};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dialog {
+  display: flex;
+  flex-direction: column;
+  // width: 100%;
+  label {
+    padding-right: 14px;
+  }
+
+  .dialogDiv {
+    margin-top: 10px;
+  }
+}
+</style>
