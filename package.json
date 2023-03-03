@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "autoprefixer": "^10.4.13",
-    "element-plus": "^2.2.32",
+    "element-plus": "^2.2.33",
     "html2canvas": "^1.4.1",
     "pinia": "^2.0.31",
     "vue": "^3.2.45",
