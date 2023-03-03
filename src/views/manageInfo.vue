@@ -1,17 +1,13 @@
 <template>
-  <div
-    style="
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-
-      /* justify-content: center; */
-      /* align-items: center; */
-    "
-  >
+  <div style="width: 100%; height: 100%; display: flex; flex-direction: column">
     <!-- {{ userInfoArr }} -->
-    <el-table align="center" :data="userInfoArr" style="width: 85%">
+    <el-table
+      align="center"
+      border
+      stripe
+      :data="userInfoArr"
+      style="width: 85%; margin-top: 40px"
+    >
       <!-- <el-table-column prop="userId" label="ID" width="180"></el-table-column> -->
       <el-table-column
         align="center"
@@ -170,8 +166,8 @@
             style="width: 300px; padding-right: 14px"
           ></el-input>
           <label style="padding-right: 14px" for="waterNumber"
-            >默认用水量</label
-          >
+            >默认用水量
+          </label>
           <el-input
             id="waterNumber"
             v-model="item.waterNumber"
@@ -204,9 +200,7 @@
       </div>
       <div class="dialogDiv">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
-          确 定
-        </el-button>
+        <el-button type="primary" @click="handleChangeInfo"> 确 定 </el-button>
       </div>
     </el-dialog>
   </div>
@@ -247,7 +241,7 @@ const handleEdit = (userHh: string) => {
 
   userInfoArr.value.forEach((item) => {
     if (item.userHh === userHh) {
-      // editForm.value = item;
+      editForm.value = item;
     }
   });
 };
@@ -255,6 +249,7 @@ const handleEdit = (userHh: string) => {
 const handleClose = (done: any) => {
   done();
 };
+
 const defaultWaterNumber = 0;
 
 const handleAddWaterClassification = () => {
@@ -262,6 +257,10 @@ const handleAddWaterClassification = () => {
     waterType: "",
     waterNumber: defaultWaterNumber,
   });
+};
+
+const handleChangeInfo = () => {
+  console.log(JSON.stringify(editForm.value.waterClassification));
 };
 
 const handleDeleteWaterClassification = (index: number) => {
