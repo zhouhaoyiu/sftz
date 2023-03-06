@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "autoprefixer": "^10.4.13",
-    "element-plus": "^2.2.32",
+    "element-plus": "^2.2.33",
     "html2canvas": "^1.4.1",
     "pinia": "^2.0.31",
     "vue": "^3.2.45",
@@ -21,7 +21,7 @@
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/jsdom": "^21.1.0",
-    "@types/node": "^18.14.4",
+    "@types/node": "^18.14.5",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitejs/plugin-vue-jsx": "^3.0.0",
     "@vue/eslint-config-prettier": "^7.0.0",
