@@ -6,64 +6,81 @@
       border
       stripe
       :data="userInfoArr"
-      style="width: 85%; margin-top: 40px"
+      style="width: 90%; margin-top: 40px"
     >
       <!-- <el-table-column prop="userId" label="ID" width="180"></el-table-column> -->
       <el-table-column
         align="center"
         prop="userHh"
         label="户号"
+        width="120"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="jfyf"
         label="缴费月份"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="userName"
         label="用户名"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="userAddress"
         label="地址"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="currentNumber"
         label="本月指数"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="lastNumber"
         label="上月指数"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="waterNumber"
         label="用水量"
+        width="100"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="userPhone"
         label="用户电话"
+        width="150"
       ></el-table-column>
       <el-table-column
         align="center"
         prop="userWx"
         label="用户微信"
+        width="100"
       ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="waterClassification"
-        label="用户水性"
-      ></el-table-column>
+      <el-table-column align="center" label="用户水性" width="250">
+        <template #default="{ row }">
+          <div v-for="(item, index) in row.waterClassification" :key="index">
+            <span>水性{{ index + 1 }}：</span>
+            <span>{{ item.waterType }}</span>
+            <span>默认用水量：</span>
+            <span>{{ item.waterNumber }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <!-- 编辑 -->
       <el-table-column align="center" label="操作">
         <template #default="{ row }">
-          <el-button type="primary" @click="handleEdit(row.userHh)">
+          <el-button type="primary" @click="handleEditUser(row.userHh)">
             编辑
+          </el-button>
+          <el-button type="danger" @click="handleDeleteUser(row.userHh)">
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -233,9 +250,12 @@ onMounted(async () => {
   const data = await res.json();
   console.log(data.data);
   userInfoArr.value = data.data;
+  userInfoArr.value.forEach((item) => {
+    item.waterClassification = JSON.parse(item.waterClassification);
+  });
 });
 
-const handleEdit = (userHh: string) => {
+const handleEditUser = (userHh: string) => {
   console.log(userHh);
   dialogVisible.value = true;
 
@@ -246,7 +266,9 @@ const handleEdit = (userHh: string) => {
   });
 };
 
-const handleClose = (done: any) => {
+const handleClose = (done: () => void) => {
+  console.log(done);
+
   done();
 };
 
@@ -257,6 +279,10 @@ const handleAddWaterClassification = () => {
     waterType: "",
     waterNumber: defaultWaterNumber,
   });
+};
+
+const handleDeleteUser = (userHh: string) => {
+  console.log(userHh);
 };
 
 const handleChangeInfo = () => {
