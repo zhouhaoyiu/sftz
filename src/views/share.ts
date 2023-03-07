@@ -48,7 +48,10 @@ const mockGetUser = {
   userPopulation: 3,
   userPhone: "12345678901",
   userWx: "zhangsan",
-  waterClassification: "居民一,生活一",
+  waterClassification: [
+    { waterType: "生活一", waterNumber: "0" },
+    { waterType: "特种一", waterNumber: "50" },
+  ],
 };
 
 export { waterTypeEnum, mockGetUser };

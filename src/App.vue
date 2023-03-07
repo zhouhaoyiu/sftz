@@ -2,7 +2,7 @@
 
 <template>
   <left-bar />
-  <router-view class="routerView" />
+  <router-view />
 </template>
 
 <style scoped lang="scss">

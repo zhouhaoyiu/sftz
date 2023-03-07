@@ -2,7 +2,7 @@
 import { type Ref, ref, onMounted, computed } from "vue";
 // router
 import { useRouter } from "vue-router";
-import { waterTypeEnum, mockGetUser } from "./share";
+import { waterTypeEnum } from "./share";
 
 const router = useRouter();
 let isSearch = ref(false);
@@ -77,7 +77,7 @@ const getWaterPrice = (
   }
 };
 
-let waterPriceList: Ref<Record<string, number>[]> = ref([
+let waterPriceList: Ref<Record<string, any>[]> = ref([
   {
     waterType: 2,
     waterNumber: 0,
@@ -119,15 +119,22 @@ let userInfo: Ref<Record<string, any>> = ref({
 let userTotalPrice: Ref<number> = ref(0);
 
 onMounted(async () => {
-  waterPriceList.value = mockGetUser.waterClassification
-    .split(",")
-    .map((item) => {
-      return {
-        waterType: waterTypeEnum.find((item2) => item2.label === item)?.value,
-        waterNumber: 0,
-        population: mockGetUser.userPopulation,
-      };
-    });
+  // waterClassification: [
+  //   { waterType: "生活一", waterNumber: "0" },
+  //   { waterType: "特种一", waterNumber: 50 },
+  // ],
+  // console.log(mockGetUser.waterClassification);
+  waterPriceList.value = [];
+  // mockGetUser.waterClassification.forEach((item: any) => {
+  //   console.log(item);
+  //   waterPriceList.value.push({
+  //     waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
+  //       ?.value,
+  //     waterNumber: Number(item.waterNumber),
+  //     population: 3,
+  //   });
+  // });
+  // console.log(waterPriceList.value);
 });
 
 let calcWaterPriceAndWrite = () => {
@@ -158,8 +165,6 @@ let calcWaterPriceAndWrite = () => {
 };
 
 const fetchUserInfo = async () => {
-  console.log(userInfo.value);
-
   const res = await fetch(
     `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`
   );
@@ -167,6 +172,16 @@ const fetchUserInfo = async () => {
   console.log(data);
   userInfo.value = data.data;
   isSearch.value = true;
+  waterPriceList.value = [];
+  JSON.parse(data.data.waterClassification).forEach((item: any) => {
+    console.log(item);
+    waterPriceList.value.push({
+      waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
+        ?.value,
+      waterNumber: Number(item.waterNumber),
+      population: 3,
+    });
+  });
 };
 
 const print = () => {
@@ -313,7 +328,7 @@ const print = () => {
       </el-button>
     </div>
   </div>
-  <div class="calcWaterprices">
+  <div class="calcWaterprices" v-if="isSearch">
     <div
       class="calcWaterprice"
       v-for="(waterPrice, waterPriceIndex) in waterPriceList"
@@ -395,6 +410,9 @@ const print = () => {
         打印
       </el-button>
     </div>
+  </div>
+  <div class="calcWaterprices" v-else>
+    <h1>请先查询用户信息</h1>
   </div>
 </template>
 

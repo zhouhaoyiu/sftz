@@ -33,6 +33,14 @@
     >
       导出
     </el-button>
+    <el-button
+      v-if="false"
+      type="primary"
+      style="width: 100%; margin-top: 20px; height: 40px"
+      @click="saveToDb"
+    >
+      保存
+    </el-button>
 
     <el-button
       type="danger"
@@ -54,14 +62,16 @@ import html2canvas from "html2canvas";
 
 const $router = useRouter();
 const $route = useRoute();
-console.log("printPage", $route.query);
-console.log(JSON.parse($route.query.waterPriceList as string));
 // let waterPriceList = JSON.parse($route.query.waterPriceList as string);
 
 // const waterType = (type: number): string => {
 //   return waterTypeEnum[type].label as string;
 // };
 const query = $route.query;
+
+console.log("printPage", query);
+console.log(JSON.parse($route.query.waterPriceList as string));
+
 const exportToImage = () => {
   // printContent
   const div = document.querySelector(".printContent") as HTMLDivElement;
@@ -80,6 +90,25 @@ const exportToImage = () => {
     // 删除
     document.body.removeChild(image);
   });
+};
+
+const saveToDb = async () => {
+  console.log("saveToDb");
+  // 将本次指数设置为0，上次指数设置为本次指数
+
+  const res = await fetch("http://localhost:3000/saveWaterPrice", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userHh: query.userHh,
+      currentNumber: 0,
+      lastNumber: query.currentNumber,
+    }),
+  });
+  const data = await res.json();
+  console.log(data);
 };
 
 onMounted(() => {
