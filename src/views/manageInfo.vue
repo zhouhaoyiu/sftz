@@ -68,6 +68,7 @@
           <div v-for="(item, index) in row.waterClassification" :key="index">
             <span>水性{{ index + 1 }}：</span>
             <span>{{ item.waterType }}</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;
             <span>默认用水量：</span>
             <span>{{ item.waterNumber }}</span>
           </div>

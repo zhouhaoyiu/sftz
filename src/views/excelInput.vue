@@ -1,9 +1,10 @@
 <template>
   <div>
     <!-- 导入excel文件 -->
-    <button class="" @click="($event) => importExcel($event)">
+    <input type="file" @change="($event) => importExcel($event)" />
+    <!-- <button class="" @click="($event) => importExcel($event)">
       导入excel文件
-    </button>
+    </button> -->
   </div>
 </template>
 

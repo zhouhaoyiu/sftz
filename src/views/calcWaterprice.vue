@@ -223,6 +223,7 @@ const print = () => {
     <div>
       <label for="population">户号</label>
       <el-input
+        @keyup.enter="fetchUserInfo"
         v-model="userInfo.userHh"
         id="population"
         style="width: 150px"

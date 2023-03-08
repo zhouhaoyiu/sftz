@@ -25,6 +25,25 @@
       <div class="userTotalUse">
         {{ query.userTotalUse }}
       </div>
+      <div
+        class="userPriceList"
+        v-for="(price, listIndex) in formatWaterPriceList"
+        :key="listIndex"
+      >
+        <div class="userPriceItemWaterType">
+          {{ price.waterType }}
+        </div>
+
+        <div class="userPriceItemWaterNumber">
+          {{ price.waterNumber }}
+        </div>
+        <div class="userPriceItemWaterUnitPrice">
+          {{ price.waterUnitPrice }}
+        </div>
+        <div class="userPriceItemWaterPrice">
+          {{ price.waterPrice }}
+        </div>
+      </div>
     </div>
     <el-button
       type="primary"
@@ -56,46 +75,58 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-// import { waterTypeEnum } from "./share";
+import { getWaterPriceUnitPrice, waterTypeEnum } from "./share";
 import sftzd from "../assets/sftzd.jpg";
 import html2canvas from "html2canvas";
 
 const $router = useRouter();
 const $route = useRoute();
-// let waterPriceList = JSON.parse($route.query.waterPriceList as string);
 
-// const waterType = (type: number): string => {
-//   return waterTypeEnum[type].label as string;
-// };
 const query = $route.query;
 
 console.log("printPage", query);
-console.log(JSON.parse($route.query.waterPriceList as string));
+console.log(
+  JSON.stringify(JSON.parse($route.query.waterPriceList as string), null, 2)
+);
+
+const formatWaterPriceList = JSON.parse(
+  $route.query.waterPriceList as string
+).map((item: any) => {
+  return {
+    waterType: waterTypeEnum[item.waterType].label,
+    waterNumber: item.waterNumber,
+    // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
+    waterUnitPrice: getWaterPriceUnitPrice(
+      waterTypeEnum[item.waterType].label,
+      item.waterNumber
+    ),
+    waterPrice:
+      getWaterPriceUnitPrice(
+        waterTypeEnum[item.waterType].label,
+        item.waterNumber
+      ) * item.waterNumber,
+  };
+});
+
+console.log(JSON.stringify(formatWaterPriceList, null, 2));
 
 const exportToImage = () => {
-  // printContent
   const div = document.querySelector(".printContent") as HTMLDivElement;
-  // 将div转化为image
   html2canvas(div).then((canvas) => {
     const img = canvas.toDataURL("image/png");
     const image = new Image();
     image.src = img;
     document.body.appendChild(image);
-    // 下载
     const a = document.createElement("a");
     a.href = img;
     a.download = `水费通知单-${query.userName}.png`;
     a.click();
-
-    // 删除
     document.body.removeChild(image);
   });
 };
 
 const saveToDb = async () => {
   console.log("saveToDb");
-  // 将本次指数设置为0，上次指数设置为本次指数
-
   const res = await fetch("http://localhost:3000/saveWaterPrice", {
     method: "POST",
     headers: {
@@ -199,5 +230,34 @@ onMounted(() => {
   align-items: center;
   font-size: 16px;
   font-weight: bold;
+}
+
+.userPriceList {
+  position: absolute;
+  top: 270px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .userPriceItemWaterType {
+    width: 30%;
+    text-align: center;
+  }
+  .userPriceItemWaterNumber {
+    width: 30%;
+    text-align: center;
+  }
+  .userPriceItemWaterUnitPrice {
+    width: 30%;
+    text-align: center;
+  }
+  .userPriceItemWaterPrice {
+    width: 30%;
+    text-align: center;
+  }
 }
 </style>
