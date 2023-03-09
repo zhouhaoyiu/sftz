@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { type Ref, ref, onMounted, computed } from "vue";
-// router
+import { dayjs } from "element-plus";
 import { useRouter } from "vue-router";
 import { waterTypeEnum } from "./share";
 
@@ -171,6 +171,8 @@ const fetchUserInfo = async () => {
   const data = await res.json();
   console.log(data);
   userInfo.value = data.data;
+  // 当前月份 如2023-03
+  userInfo.value.jfyf = dayjs().format("YYYY-MM");
   isSearch.value = true;
   waterPriceList.value = [];
   JSON.parse(data.data.waterClassification).forEach((item: any) => {

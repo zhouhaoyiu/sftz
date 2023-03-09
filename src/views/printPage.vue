@@ -28,6 +28,9 @@
       <div
         class="userPriceList"
         v-for="(price, listIndex) in formatWaterPriceList"
+        :style="{
+          left: 250 + listIndex * 80 + 'px',
+        }"
         :key="listIndex"
       >
         <div class="userPriceItemWaterType">
@@ -38,11 +41,20 @@
           {{ price.waterNumber }}
         </div>
         <div class="userPriceItemWaterUnitPrice">
-          {{ price.waterUnitPrice }}
+          {{ price.waterUnitPrice + "¥" }}
         </div>
         <div class="userPriceItemWaterPrice">
           {{ price.waterPrice }}
         </div>
+      </div>
+      <!-- 合计 -->
+      <div class="userPriceItemWaterNumberAll">
+        {{
+          formatWaterPriceList.reduce(
+            (acc: any, cur: any) => acc + cur.waterNumber,
+            0
+          )
+        }}
       </div>
     </div>
     <el-button
@@ -234,30 +246,40 @@ onMounted(() => {
 
 .userPriceList {
   position: absolute;
-  top: 270px;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 290px;
+  left: 250px;
+  // width: 100%;
+  // height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
+  font-weight: bold;
   .userPriceItemWaterType {
-    width: 30%;
-    text-align: center;
+    position: absolute;
+    width: max-content;
   }
   .userPriceItemWaterNumber {
-    width: 30%;
-    text-align: center;
+    position: absolute;
+    top: 15px;
+    width: max-content;
   }
   .userPriceItemWaterUnitPrice {
-    width: 30%;
-    text-align: center;
+    position: absolute;
+    top: 42px;
+    width: max-content;
   }
   .userPriceItemWaterPrice {
-    width: 30%;
-    text-align: center;
+    position: absolute;
+    width: max-content;
+    top: 69px;
   }
+}
+.userPriceItemWaterNumberAll {
+  position: absolute;
+  top: 310px;
+  left: 645px;
+  width: max-content;
+  font-weight: bold;
 }
 </style>
