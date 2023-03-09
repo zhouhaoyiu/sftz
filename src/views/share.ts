@@ -81,4 +81,4 @@ const getWaterPriceUnitPrice = (
   }
 };
 
-export { waterTypeEnum, mockGetUser, getWaterPriceUnitPrice };
+export { waterTypeEnum, mockGetUser, getWaterPriceUnitPrice, repeat };

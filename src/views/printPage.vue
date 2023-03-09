@@ -10,6 +10,9 @@
       <div class="userHh">
         {{ query.userHh }}
       </div>
+      <div class="jfyf">
+        {{ query.jfyf }}
+      </div>
       <div class="userName">
         {{ query.userName }}
       </div>
@@ -44,7 +47,7 @@
           {{ price.waterUnitPrice + "¥" }}
         </div>
         <div class="userPriceItemWaterPrice">
-          {{ price.waterPrice }}
+          {{ price.waterPrice + "¥" }}
         </div>
       </div>
       <!-- 合计 -->
@@ -54,6 +57,14 @@
             (acc: any, cur: any) => acc + cur.waterNumber,
             0
           )
+        }}
+      </div>
+      <div class="userPriceItemWaterPriceAll">
+        {{
+          formatWaterPriceList.reduce(
+            (acc: any, cur: any) => acc + cur.waterPrice,
+            0
+          ) + "¥"
         }}
       </div>
     </div>
@@ -187,6 +198,18 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
 }
+
+.jfyf {
+  position: absolute;
+  top: 90px;
+  left: 550px;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+}
 .userName {
   position: absolute;
   top: 115px;
@@ -279,6 +302,14 @@ onMounted(() => {
   position: absolute;
   top: 310px;
   left: 645px;
+  width: max-content;
+  font-weight: bold;
+}
+
+.userPriceItemWaterPriceAll {
+  position: absolute;
+  top: 370px;
+  left: 640px;
   width: max-content;
   font-weight: bold;
 }

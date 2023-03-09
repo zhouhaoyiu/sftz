@@ -1,3 +1,4 @@
+<!-- eslint-disable no-undef -->
 <script lang="ts" setup>
 import { type Ref, ref, onMounted, computed } from "vue";
 import { dayjs } from "element-plus";
@@ -170,6 +171,11 @@ const fetchUserInfo = async () => {
   );
   const data = await res.json();
   console.log(data);
+  if (data.data == null) {
+    // @ts-ignore
+    ElMessage.error("未查询到该用户信息");
+    return;
+  }
   userInfo.value = data.data;
   // 当前月份 如2023-03
   userInfo.value.jfyf = dayjs().format("YYYY-MM");
@@ -225,6 +231,7 @@ const print = () => {
     <div>
       <label for="population">户号</label>
       <el-input
+        autofocus
         @keyup.enter="fetchUserInfo"
         v-model="userInfo.userHh"
         id="population"
