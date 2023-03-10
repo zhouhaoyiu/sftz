@@ -1,7 +1,11 @@
 <template>
-  <div style="width: 100%; height: 100%; display: flex; flex-direction: column">
+  <div
+    style="width: 100%; height: 100%; display: flex; flex-direction: column"
+    class="page"
+  >
     <!-- {{ userInfoArr }} -->
     <el-table
+      class="userInfoTable"
       align="center"
       border
       stripe
@@ -312,6 +316,17 @@ const handleDeleteWaterClassification = (index: number) => {
 
   .dialogDiv {
     margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .userInfoTable {
+    width: 95% !important;
+  }
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 </style>

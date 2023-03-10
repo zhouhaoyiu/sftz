@@ -1,10 +1,13 @@
 <template>
   <div>
     <!-- 导入excel文件 -->
-    <input type="file" @change="($event) => importExcel($event)" />
-    <!-- <button class="" @click="($event) => importExcel($event)">
-      导入excel文件
-    </button> -->
+    <input
+      type="file"
+      class="fileInput"
+      @change="($event) => importExcel($event)"
+      v-show="false"
+    />
+    <button class="" @click="($event) => clickFile()">导入excel文件</button>
   </div>
 </template>
 
@@ -27,6 +30,12 @@ const importExcel = (e: any) => {
     console.log(json);
   };
   reader.readAsBinaryString(file);
+};
+
+const clickFile = () => {
+  const fileInput = document.querySelector(".fileInput")! as HTMLInputElement;
+  // console.log(fileInput);
+  fileInput.click();
 };
 </script>
 

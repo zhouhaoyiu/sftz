@@ -59,17 +59,31 @@
       <!-- 合计 -->
       <div class="userPriceItemWaterNumberAll">
         {{
-          formatWaterPriceList.reduce(
-            (acc: any, cur: any) => acc + cur.waterNumber,
-            0
+          NP.strip(
+            formatWaterPriceList.reduce(
+              (acc: any, cur: any) => acc + cur.waterNumber,
+              0
+            )
           )
         }}
       </div>
       <div class="userPriceItemWaterPriceAll">
         {{
-          formatWaterPriceList.reduce(
-            (acc: any, cur: any) => acc + cur.waterPrice,
-            0
+          NP.strip(
+            formatWaterPriceList.reduce(
+              (acc: any, cur: any) => acc + cur.waterPrice,
+              0
+            )
+          ) + "¥"
+        }}
+      </div>
+      <div class="userPriceItemBornePriceAll">
+        {{
+          NP.strip(
+            formatWaterPriceList.reduce(
+              (acc: any, cur: any) => acc + cur.waterBornePriceTotal,
+              0
+            )
           ) + "¥"
         }}
       </div>
@@ -331,7 +345,15 @@ onMounted(() => {
 .userPriceItemWaterPriceAll {
   position: absolute;
   top: 370px;
-  left: 625px;
+  left: 635px;
+  width: max-content;
+  font-weight: bold;
+}
+
+.userPriceItemBornePriceAll {
+  position: absolute;
+  top: 460px;
+  left: 635px;
   width: max-content;
   font-weight: bold;
 }

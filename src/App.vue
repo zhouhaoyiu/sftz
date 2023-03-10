@@ -2,12 +2,25 @@
 
 <template>
   <left-bar />
-  <router-view />
+  <div class="routerView">
+    <router-view />
+  </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .routerView {
-  width: calc(100% - 300px) !important;
+  width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  // justify-content: center;
+}
+@media screen and (max-width: 768px) {
+  .routerView {
+    padding-top: 40px;
+    justify-content: center !important;
+    flex-direction: column !important;
+  }
 }
 </style>

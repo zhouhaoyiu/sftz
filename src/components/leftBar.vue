@@ -47,6 +47,27 @@ const hilight = (path: string): boolean => {
 </script>
 
 <style scoped lang="scss">
+@media screen and (max-width: 768px) {
+  .leftBar {
+    width: 100% !important;
+    padding: 0% !important;
+    flex-direction: row !important;
+    margin-right: 0 !important;
+    background: transparent !important;
+    // 吸顶
+    position: fixed;
+    top: 0;
+    height: 50px !important;
+    z-index: 999;
+
+    .el-button {
+      width: 33.33% !important;
+      margin-bottom: 0 !important;
+      margin-left: 0 !important;
+      height: 50px !important;
+    }
+  }
+}
 .leftBar {
   width: 200px;
   min-width: 200px;
