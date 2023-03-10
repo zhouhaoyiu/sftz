@@ -353,7 +353,7 @@ onMounted(() => {
 .userPriceItemBornePriceAll {
   position: absolute;
   top: 460px;
-  left: 635px;
+  left: 640px;
   width: max-content;
   font-weight: bold;
 }

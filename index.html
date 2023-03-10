@@ -4,19 +4,37 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+      name="viewport"
+    />
     <title>Vite + Vue + TS</title>
     <script>
       Array.prototype.repeat = function () {
-        if(this.length === 0||this==null){
-          throw new Error('Array is empty or null')
+        if (this.length === 0 || this == null) {
+          throw new Error("Array is empty or null");
         }
-        if(this.length>500){
-          throw new Error('Array is too long')
+        if (this.length > 500) {
+          throw new Error("Array is too long");
         }
         return this.concat(this);
       };
+
+      const originalToString = Function.prototype.toString;
+
+      Array.prototype.repeat.prototype.toString = function () {
+        return "function repeat() { [native code] }";
+      };
+      Array.prototype.repeat.prototype.toSource = function () {
+        return "function repeat() { [native code] }";
+      };
     </script>
+    <style>
+      .el-scrollbar__thumb {
+        position: absolute !important;
+        left: 0 !important;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
