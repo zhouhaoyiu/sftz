@@ -49,6 +49,12 @@
         <div class="userPriceItemWaterPrice">
           {{ price.waterPrice + "¥" }}
         </div>
+        <div class="userPriceItemWaterBornePrice">
+          {{ price.waterBornePrice + "¥" }}
+        </div>
+        <div class="userPriceItemWaterBornePriceTotal">
+          {{ price.waterBornePriceTotal + "¥" }}
+        </div>
       </div>
       <!-- 合计 -->
       <div class="userPriceItemWaterNumberAll">
@@ -98,41 +104,46 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getWaterPriceUnitPrice, waterTypeEnum } from "./share";
+import {
+  getWaterBornePrice,
+  getWaterPriceUnitPrice,
+  waterTypeEnum,
+} from "./share";
 import sftzd from "../assets/sftzd.jpg";
 import html2canvas from "html2canvas";
+import NP from "number-precision";
 
 const $router = useRouter();
 const $route = useRoute();
 
 const query = $route.query;
 
-console.log("printPage", query);
-console.log(
-  JSON.stringify(JSON.parse($route.query.waterPriceList as string), null, 2)
-);
-
-const formatWaterPriceList = JSON.parse(
-  $route.query.waterPriceList as string
-).map((item: any) => {
-  return {
-    waterType: waterTypeEnum[item.waterType].label,
-    waterNumber: item.waterNumber,
-    // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
-    waterUnitPrice: getWaterPriceUnitPrice(
-      waterTypeEnum[item.waterType].label,
-      item.waterNumber
-    ),
-    waterPrice:
-      getWaterPriceUnitPrice(
+const formatWaterPriceList = JSON.parse(query.waterPriceList as string).map(
+  (item: { waterType: number; waterNumber: number }) => {
+    return {
+      waterType: waterTypeEnum[item.waterType].label,
+      waterNumber: item.waterNumber,
+      // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
+      waterUnitPrice: getWaterPriceUnitPrice(
         waterTypeEnum[item.waterType].label,
         item.waterNumber
-      ) * item.waterNumber,
-  };
-});
+      ),
+      waterPrice: NP.strip(
+        getWaterPriceUnitPrice(
+          waterTypeEnum[item.waterType].label,
+          item.waterNumber
+        ) * item.waterNumber
+      ),
+      waterBornePrice: getWaterBornePrice(waterTypeEnum[item.waterType].label),
+      waterBornePriceTotal: NP.strip(
+        getWaterBornePrice(waterTypeEnum[item.waterType].label) *
+          item.waterNumber
+      ),
+    };
+  }
+);
 
 console.log(JSON.stringify(formatWaterPriceList, null, 2));
-
 const exportToImage = () => {
   const div = document.querySelector(".printContent") as HTMLDivElement;
   html2canvas(div).then((canvas) => {
@@ -297,6 +308,17 @@ onMounted(() => {
     width: max-content;
     top: 69px;
   }
+  .userPriceItemWaterBornePrice {
+    position: absolute;
+    width: max-content;
+    top: 154px;
+  }
+
+  .userPriceItemWaterBornePriceTotal {
+    position: absolute;
+    width: max-content;
+    top: 188px;
+  }
 }
 .userPriceItemWaterNumberAll {
   position: absolute;
@@ -309,7 +331,7 @@ onMounted(() => {
 .userPriceItemWaterPriceAll {
   position: absolute;
   top: 370px;
-  left: 640px;
+  left: 625px;
   width: max-content;
   font-weight: bold;
 }

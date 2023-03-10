@@ -223,8 +223,9 @@
     </el-dialog>
   </div>
 </template>
-
+<!-- eslint-disable no-undef -->
 <script lang="ts" setup>
+// import { ElMessage } from "element-plus";
 import { onMounted, ref, type Ref } from "vue";
 let userInfoArr: Ref<any[]> = ref([]);
 let dialogVisible: Ref<boolean> = ref(false);
@@ -247,13 +248,18 @@ let editForm: Ref<any> = ref({
 });
 
 onMounted(async () => {
-  const res = await fetch("http://192.168.88.109:7001/user/get_all_user");
-  const data = await res.json();
-  console.log(data.data);
-  userInfoArr.value = data.data;
-  userInfoArr.value.forEach((item) => {
-    item.waterClassification = JSON.parse(item.waterClassification);
-  });
+  try {
+    const res = await fetch("http://192.168.88.109:7001/user/get_all_user");
+    const data = await res.json();
+    console.log(data.data);
+    userInfoArr.value = data.data;
+    userInfoArr.value.forEach((item) => {
+      item.waterClassification = JSON.parse(item.waterClassification);
+    });
+  } catch (error) {
+    // @ts-ignore
+    ElMessage.error("获取用户信息失败");
+  }
 });
 
 const handleEditUser = (userHh: string) => {

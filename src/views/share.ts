@@ -56,9 +56,10 @@ const mockGetUser = {
 
 const getWaterPriceUnitPrice = (
   waterType: string,
-  waterNumber: number,
-  population = 3
-) => {
+  waterNumber: number
+  // population = 3
+): number => {
+  void waterNumber;
   switch (waterType) {
     case "生活一":
       return 2.4;
@@ -81,4 +82,32 @@ const getWaterPriceUnitPrice = (
   }
 };
 
-export { waterTypeEnum, mockGetUser, getWaterPriceUnitPrice };
+const getWaterBornePrice = (waterType: string): number => {
+  switch (waterType) {
+    case "生活一":
+      return 0.95;
+    case "生活二":
+      return 0.5;
+    case "居民一":
+      return 0.95;
+    case "居民二":
+      return 0.5;
+    case "非居民一":
+      return 1.4;
+    case "非居民二":
+      return 1.4;
+    case "特种一":
+      return 1.4;
+    case "非居民四":
+      return 1.4;
+    default:
+      return 0;
+  }
+};
+
+export {
+  waterTypeEnum,
+  mockGetUser,
+  getWaterPriceUnitPrice,
+  getWaterBornePrice,
+};

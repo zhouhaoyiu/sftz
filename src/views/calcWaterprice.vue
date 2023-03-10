@@ -120,6 +120,13 @@ let userInfo: Ref<Record<string, any>> = ref({
 let userTotalPrice: Ref<number> = ref(0);
 
 onMounted(async () => {
+  const population = document.getElementsByClassName(
+    "el-input__inner"
+  )[0]! as HTMLInputElement;
+  if (population) {
+    population.focus();
+  }
+
   // waterClassification: [
   //   { waterType: "生活一", waterNumber: "0" },
   //   { waterType: "特种一", waterNumber: 50 },
@@ -231,7 +238,6 @@ const print = () => {
     <div>
       <label for="population">户号</label>
       <el-input
-        autofocus
         @keyup.enter="fetchUserInfo"
         v-model="userInfo.userHh"
         id="population"

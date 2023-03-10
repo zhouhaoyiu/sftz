@@ -13,6 +13,7 @@
     "autoprefixer": "^10.4.13",
     "element-plus": "^2.2.36",
     "html2canvas": "^1.4.1",
+    "number-precision": "^1.6.0",
     "pinia": "^2.0.33",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
