@@ -173,30 +173,36 @@ let calcWaterPriceAndWrite = () => {
 };
 
 const fetchUserInfo = async () => {
-  const res = await fetch(
-    `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`
-  );
-  const data = await res.json();
-  console.log(data);
-  if (data.data == null) {
-    // @ts-ignore
-    ElMessage.error("未查询到该用户信息");
-    return;
-  }
-  userInfo.value = data.data;
-  // 当前月份 如2023-03
-  userInfo.value.jfyf = dayjs().format("YYYY-MM");
-  isSearch.value = true;
-  waterPriceList.value = [];
-  JSON.parse(data.data.waterClassification).forEach((item: any) => {
-    console.log(item);
-    waterPriceList.value.push({
-      waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
-        ?.value,
-      waterNumber: Number(item.waterNumber),
-      population: 3,
+  try {
+    const res = await fetch(
+      `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (data.data == null) {
+      // @ts-ignore
+      ElMessage.error("未查询到该用户信息");
+      return;
+    }
+    userInfo.value = data.data;
+    // 当前月份 如2023-03
+    userInfo.value.jfyf = dayjs().format("YYYY-MM");
+    isSearch.value = true;
+    waterPriceList.value = [];
+    JSON.parse(data.data.waterClassification).forEach((item: any) => {
+      console.log(item);
+      waterPriceList.value.push({
+        waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
+          ?.value,
+        waterNumber: Number(item.waterNumber),
+        population: 3,
+      });
     });
-  });
+  } catch (e) {
+    console.log(e);
+    // @ts-ignore
+    ElMessage.error("查询用户信息失败");
+  }
 };
 
 const print = () => {

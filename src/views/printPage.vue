@@ -209,8 +209,9 @@ onMounted(() => {
 }
 .printContent {
   position: relative;
-  border: 1px solid #000;
+  border: 1px solid #ccc;
   font-size: 14px;
+  height: 700px;
 }
 .userHh {
   position: absolute;
