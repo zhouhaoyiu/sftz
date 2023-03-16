@@ -36,6 +36,41 @@ const waterTypeEnum: Record<string | number, any>[] = [
   },
 ];
 
+const waterTypeOptions = [
+  {
+    label: "生活一",
+    value: "生活一",
+  },
+  {
+    label: "生活二",
+    value: "生活二",
+  },
+  {
+    label: "居民一",
+    value: "居民一",
+  },
+  {
+    label: "居民二",
+    value: "居民二",
+  },
+  {
+    label: "非居民一",
+    value: "非居民一",
+  },
+  {
+    label: "非居民二",
+    value: "非居民二",
+  },
+  {
+    label: "特种一",
+    value: "特种一",
+  },
+  {
+    label: "非居民四",
+    value: "非居民四",
+  },
+];
+
 const mockGetUser = {
   userId: 1,
   userHh: "123456",
@@ -108,6 +143,7 @@ const getWaterBornePrice = (waterType: string): number => {
 export {
   waterTypeEnum,
   mockGetUser,
+  waterTypeOptions,
   getWaterPriceUnitPrice,
   getWaterBornePrice,
 };

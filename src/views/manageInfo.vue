@@ -156,12 +156,18 @@
           <!-- TODO:改为select -->
           <div>
             <label for="waterType">水性{{ index + 1 }}</label>
-            <el-input
-              id="waterType"
+            <el-select
               v-model="item.waterType"
-              placeholder="水性"
+              placeholder="请选择水性"
               style="width: 300px; padding-right: 14px"
-            ></el-input>
+            >
+              <el-option
+                v-for="item in waterTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </div>
           <div>
             <label for="waterNumber">默认用水量</label>
@@ -294,12 +300,24 @@
             水性{{ index + 1 }}
           </label>
           <!-- TODO:改为select -->
-          <el-input
+          <!-- <el-input
             id="waterType"
             v-model="item.waterType"
             placeholder="水性"
             style="width: 300px; padding-right: 14px"
-          ></el-input>
+          ></el-input> -->
+          <el-select
+            v-model="item.waterType"
+            placeholder="请选择水性"
+            style="width: 300px; padding-right: 14px"
+          >
+            <el-option
+              v-for="item in waterTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
           <label style="padding-right: 14px" for="waterNumber">
             默认用水量
           </label>
@@ -343,8 +361,10 @@
 <!-- eslint-disable no-undef -->
 <script lang="ts" setup>
 // import { ElMessage } from "element-plus";
+import { waterTypeOptions } from "./share";
 import dayjs from "dayjs";
 import { onMounted, ref, type Ref } from "vue";
+let editHh: Ref<string> = ref("");
 let userInfoArr: Ref<any[]> = ref([]);
 let dialogVisible: Ref<boolean> = ref(false);
 let addUserDialogVisible: Ref<boolean> = ref(false);
@@ -397,6 +417,14 @@ let submitAddUser = async () => {
     });
     const data = await res.json();
     console.log(data.data);
+    if (data.success) {
+      // @ts-ignore
+      ElMessage.success("新增用户成功");
+      addUserDialogVisible.value = false;
+    } else {
+      // @ts-ignore
+      ElMessage.error("新增用户失败");
+    }
   } catch (error) {
     // @ts-ignore
     ElMessage.error("新增用户失败");
@@ -419,7 +447,7 @@ onMounted(async () => {
 });
 
 const handleEditUser = (userHh: string) => {
-  console.log(userHh);
+  editHh.value = userHh;
   dialogVisible.value = true;
 
   userInfoArr.value.forEach((item) => {
@@ -453,8 +481,33 @@ const handleDeleteUser = (userHh: string) => {
   console.log(userHh);
 };
 
-const handleChangeInfo = () => {
-  console.log(JSON.stringify(editForm.value.waterClassification));
+const handleChangeInfo = async () => {
+  // console.log(JSON.stringify(editForm.value.waterClassification));
+  const sendData = {
+    ...editForm.value,
+    waterClassification: JSON.stringify(editForm.value.waterClassification),
+    editUserHh: editHh.value,
+  };
+  const changeRes = await fetch(
+    "http://192.168.88.109:7001/user/update_user_by_userHh",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(sendData),
+    }
+  );
+  const changeData = await changeRes.json();
+  console.log(changeData);
+  if (changeData.success) {
+    // @ts-ignore
+    ElMessage.success("修改成功");
+    dialogVisible.value = false;
+  } else {
+    // @ts-ignore
+    ElMessage.error("修改失败");
+  }
 };
 
 const handleDeleteWaterClassification = (index: number) => {
