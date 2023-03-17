@@ -96,12 +96,12 @@
       导出
     </el-button>
     <el-button
-      v-if="false"
-      type="primary"
-      style="width: 100%; margin-top: 20px; height: 40px"
+      v-if="1"
+      type=""
+      style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px"
       @click="saveToDb"
     >
-      保存
+      保存到数据库
     </el-button>
 
     <el-button
@@ -174,20 +174,23 @@ const exportToImage = () => {
 };
 
 const saveToDb = async () => {
-  console.log("saveToDb");
-  const res = await fetch("http://localhost:3000/saveWaterPrice", {
+  const res = await fetch("http://localhost:3000/update_user_by_userHh", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      userHh: query.userHh,
+      editUserHh: query.userHh,
       currentNumber: 0,
       lastNumber: query.currentNumber,
     }),
   });
   const data = await res.json();
-  console.log(data);
+  if (data.success) {
+    // @ts-ignore
+    // eslint-disable-next-line no-undef
+    ElMessage.success("保存成功");
+  }
 };
 
 onMounted(() => {

@@ -195,7 +195,7 @@ const fetchUserInfo = async () => {
         waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
           ?.value,
         waterNumber: Number(item.waterNumber),
-        population: 3,
+        population: data.data.userPopulation,
       });
     });
   } catch (e) {
@@ -305,12 +305,7 @@ const print = () => {
     <div>
       <!-- 最迟缴费日期 -->
       <label for="latestPaymentDate">最迟缴费日期</label>
-      <el-date-picker
-        v-model="userInfo.latestPaymentDate"
-        type="date"
-        placeholder="选择日期"
-        style="width: 150px"
-      />
+      {{ userInfo.latestPaymentDate || "请输入户号后查询" }}
     </div>
     <div>
       <!-- 总用量 -->
@@ -518,7 +513,7 @@ const print = () => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin-bottom: 20px;
     width: 90%;
     height: 100px;
@@ -527,17 +522,20 @@ const print = () => {
 
     label {
       margin-right: 20px;
+      width: max-content;
     }
 
     .waterType {
       display: flex;
       justify-content: center;
-      width: 25%;
+      align-items: center;
+      width: 30%;
     }
 
     .waterNumber {
       display: flex;
       justify-content: center;
+      align-items: center;
       width: 25%;
     }
 
