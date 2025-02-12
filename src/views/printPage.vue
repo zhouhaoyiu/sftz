@@ -28,14 +28,9 @@
       <div class="userTotalUse">
         {{ query.userTotalUse }}
       </div>
-      <div
-        class="userPriceList"
-        v-for="(price, listIndex) in formatWaterPriceList"
-        :style="{
+      <div class="userPriceList" v-for="(price, listIndex) in formatWaterPriceList" :style="{
           left: 250 + listIndex * 80 + 'px',
-        }"
-        :key="listIndex"
-      >
+        }" :key="listIndex">
         <div class="userPriceItemWaterType">
           {{ price.waterType }}
         </div>
@@ -69,47 +64,34 @@
       </div>
       <div class="userPriceItemWaterPriceAll">
         {{
-          NP.strip(
-            formatWaterPriceList.reduce(
-              (acc: any, cur: any) => acc + cur.waterPrice,
-              0
-            )
-          ) + "¥"
-        }}
+            NP.strip(
+              formatWaterPriceList.reduce(
+                (acc: any, cur: any) => acc + cur.waterPrice,
+                0
+              )
+            ) + "¥"
+          }}
       </div>
       <div class="userPriceItemBornePriceAll">
         {{
-          NP.strip(
-            formatWaterPriceList.reduce(
-              (acc: any, cur: any) => acc + cur.waterBornePriceTotal,
-              0
-            )
-          ) + "¥"
-        }}
+            NP.strip(
+              formatWaterPriceList.reduce(
+                (acc: any, cur: any) => acc + cur.waterBornePriceTotal,
+                0
+              )
+            ) + "¥"
+          }}
       </div>
     </div>
-    <el-button
-      type="primary"
-      style="width: 100%; margin-top: 20px; height: 40px"
-      @click="exportToImage()"
-    >
+    <el-button type="primary" style="width: 100%; margin-top: 20px; height: 40px" @click="exportToImage()">
       导出
     </el-button>
-    <el-button
-      v-if="1"
-      type=""
-      style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px"
-      @click="saveToDb"
-    >
+    <el-button v-if="1" type="" style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px" @click="saveToDb">
       保存到数据库
     </el-button>
 
-    <el-button
-      type="danger"
-      plain
-      style="width: 100%; margin-top: 20px; height: 40px; margin-left: 0"
-      @click="$router.push('/calc-waterprice')"
-    >
+    <el-button type="danger" plain style="width: 100%; margin-top: 20px; height: 40px; margin-left: 0"
+      @click="$router.push('/calc-waterprice')">
       返回
     </el-button>
   </div>
@@ -151,7 +133,7 @@ const formatWaterPriceList = JSON.parse(query.waterPriceList as string).map(
       waterBornePrice: getWaterBornePrice(waterTypeEnum[item.waterType].label),
       waterBornePriceTotal: NP.strip(
         getWaterBornePrice(waterTypeEnum[item.waterType].label) *
-          item.waterNumber
+        item.waterNumber
       ),
     };
   }
@@ -210,12 +192,14 @@ onMounted(() => {
 .waterPriceItem {
   border: 1px solid #000;
 }
+
 .printContent {
   position: relative;
   border: 1px solid #ccc;
   font-size: 14px;
   height: 700px;
 }
+
 .userHh {
   position: absolute;
   top: 87px;
@@ -239,6 +223,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
 }
+
 .userName {
   position: absolute;
   top: 115px;
@@ -250,6 +235,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
 }
+
 .userAddress {
   position: absolute;
   top: 143px;
@@ -261,6 +247,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
 }
+
 .currentNumber {
   position: absolute;
   top: 171px;
@@ -284,6 +271,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: bold;
 }
+
 .userTotalUse {
   position: absolute;
   top: 225px;
@@ -307,25 +295,30 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-weight: bold;
+
   .userPriceItemWaterType {
     position: absolute;
     width: max-content;
   }
+
   .userPriceItemWaterNumber {
     position: absolute;
     top: 15px;
     width: max-content;
   }
+
   .userPriceItemWaterUnitPrice {
     position: absolute;
     top: 42px;
     width: max-content;
   }
+
   .userPriceItemWaterPrice {
     position: absolute;
     width: max-content;
     top: 69px;
   }
+
   .userPriceItemWaterBornePrice {
     position: absolute;
     width: max-content;
@@ -338,6 +331,7 @@ onMounted(() => {
     top: 188px;
   }
 }
+
 .userPriceItemWaterNumberAll {
   position: absolute;
   top: 310px;
