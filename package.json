@@ -39,7 +39,7 @@
     "unplugin-auto-import": "19.1.1",
     "unplugin-vue-components": "28.4.1",
     "vite": "^6.2.2",
-    "vitest": "^0.33.0",
+    "vitest": "^3.0.9",
     "vue-tsc": "^2.2.8"
   }
 }
