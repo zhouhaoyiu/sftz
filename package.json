@@ -20,7 +20,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.13.0",
+    "@rushstack/eslint-patch": "^1.14.0",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.7.2",
     "@vitejs/plugin-vue": "6.0.1",
