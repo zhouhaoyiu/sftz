@@ -14,7 +14,7 @@
     "element-plus": "^2.11.7",
     "html2canvas": "^1.4.1",
     "number-precision": "^1.6.0",
-    "pinia": "^3.0.3",
+    "pinia": "^3.0.4",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
     "xlsx": "^0.18.5"
