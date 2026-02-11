@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "element-plus": "^2.13.1",
     "html2canvas": "^1.4.1",
     "number-precision": "^1.6.0",
