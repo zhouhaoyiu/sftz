@@ -185,8 +185,9 @@
 <!-- eslint-disable no-undef -->
 <script lang="ts" setup>
 // import { ElMessage } from "element-plus";
+import { dayjs } from "element-plus";
 import { waterTypeOptions } from "./share";
-import dayjs from "dayjs";
+
 import { onMounted, ref, type Ref } from "vue";
 let editHh: Ref<string> = ref("");
 let userInfoArr: Ref<any[]> = ref([]);
