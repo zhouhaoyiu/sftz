@@ -1,6 +1,13 @@
 {
   "name": "sftz",
   "private": true,
+  "pnpm": {
+  "onlyBuiltDependencies": [
+    "@parcel/watcher",
+    "esbuild"
+  ]
+},
+
   "version": "0.0.0",
   "type": "module",
   "scripts": {
