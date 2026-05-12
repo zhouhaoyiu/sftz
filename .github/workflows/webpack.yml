@@ -25,6 +25,9 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@9
+        
+      - name: approve
+        run: pnpm approve-builds
 
       - name: Install dependencies
         run: pnpm install
