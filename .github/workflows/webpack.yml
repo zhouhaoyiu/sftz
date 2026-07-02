@@ -15,11 +15,14 @@ jobs:
         node-version: [23.11.0]
 
     steps:
+      - name: Configure Git
+        run: git config --global init.defaultBranch main
+
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
