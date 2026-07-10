@@ -12,8 +12,8 @@ importers:
         specifier: ^10.5.2
         version: 10.5.2(postcss@8.5.16)
       element-plus:
-        specifier: ^2.14.2
-        version: 2.14.2(vue@3.5.39(typescript@6.0.3))
+        specifier: ^2.14.3
+        version: 2.14.3(vue@3.5.39(typescript@6.0.3))
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
@@ -1067,8 +1067,8 @@ packages:
   electron-to-chromium@1.5.382:
     resolution: {integrity: sha512-8ETaWbV6SZOrno+G93Ffd9ENsMtetqdnqj4nlfxFW90Sm5GgnuV28Kf62hqQVD6VUgzm7qFQKsTsAPmeUiU3Ug==}
 
-  element-plus@2.14.2:
-    resolution: {integrity: sha512-eNH9uP3wQoNqieEIHXiNvIVv+zO5sZDU0CAZq5b0zqSN06DD0/V9xIq1R/qm3rw5k3nBTM1JvpxhCfRbaFLzDQ==}
+  element-plus@2.14.3:
+    resolution: {integrity: sha512-pJcvxcpZjYruNzuJhAeVwnbYjfNgzBKnWHwSVEhwzM2/kcLI3brzmtIBxtPqd4hQWJfD1PRnjoc1WipLw2eBGg==}
     peerDependencies:
       vue: ^3.3.7
 
@@ -2017,8 +2017,8 @@ packages:
   vscode-uri@3.1.0:
     resolution: {integrity: sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ==}
 
-  vue-component-type-helpers@3.3.5:
-    resolution: {integrity: sha512-Fe1jyPJoUGpJOYKOri44jduR7My4yYINOMJISuMAbmrs+L5LbIDUc8NTWZYY3EJLK0yPLuCmcd5zoCsE4k2/KA==}
+  vue-component-type-helpers@3.3.7:
+    resolution: {integrity: sha512-Skkhw9agYSgsWqv7bxSOGJZa9SaiJbZVGdXuFWnrzKaQYHnw9qbjD630rw6RyMqDbp54nfLCLw5SZA55if7JLg==}
 
   vue-eslint-parser@10.4.1:
     resolution: {integrity: sha512-Gk6gRDj0n/fkRa3C3l0bBheoBckUq/Rs0F/TvMWIS6nzzx67amAViMe9CkNgsP2tXyQONvGiHQESHwFtZ3aYDA==}
@@ -3155,7 +3155,7 @@ snapshots:
 
   electron-to-chromium@1.5.382: {}
 
-  element-plus@2.14.2(vue@3.5.39(typescript@6.0.3)):
+  element-plus@2.14.3(vue@3.5.39(typescript@6.0.3)):
     dependencies:
       '@ctrl/tinycolor': 4.2.0
       '@element-plus/icons-vue': 2.3.2(vue@3.5.39(typescript@6.0.3))
@@ -3172,7 +3172,7 @@ snapshots:
       memoize-one: 6.0.0
       normalize-wheel-es: 1.2.0
       vue: 3.5.39(typescript@6.0.3)
-      vue-component-type-helpers: 3.3.5
+      vue-component-type-helpers: 3.3.7
 
   emoji-regex@8.0.0: {}
 
@@ -4010,7 +4010,7 @@ snapshots:
 
   vscode-uri@3.1.0: {}
 
-  vue-component-type-helpers@3.3.5: {}
+  vue-component-type-helpers@3.3.7: {}
 
   vue-eslint-parser@10.4.1(eslint@10.6.0):
     dependencies:
