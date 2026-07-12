@@ -1,19 +1,68 @@
 <template>
-  <div style="width: 100%; height: 100%; display: flex; flex-direction: column" class="page">
+  <div
+    style="width: 100%; height: 100%; display: flex; flex-direction: column"
+    class="page"
+  >
     <div style="margin-top: 20px">
       <el-button @click="addUser" type="primary">新建用户</el-button>
     </div>
-    <el-table class="userInfoTable" align="center" border stripe :data="userInfoArr"
-      style="width: 90%; margin-top: 20px">
+    <el-table
+      class="userInfoTable"
+      align="center"
+      border
+      stripe
+      :data="userInfoArr"
+      style="width: 90%; margin-top: 20px"
+    >
       <!-- <el-table-column prop="userId" label="ID" width="180"></el-table-column> -->
-      <el-table-column align="center" prop="userHh" label="户号" width="120"></el-table-column>
-      <el-table-column align="center" prop="jfyf" label="缴费月份" width="100"></el-table-column>
-      <el-table-column align="center" prop="userName" label="用户名" width="100"></el-table-column>
-      <el-table-column align="center" prop="userAddress" label="地址" width="100"></el-table-column>
-      <el-table-column align="center" prop="currentNumber" label="本月指数" width="100"></el-table-column>
-      <el-table-column align="center" prop="lastNumber" label="上月指数" width="100"></el-table-column>
-      <el-table-column align="center" prop="userPhone" label="用户电话" width="150"></el-table-column>
-      <el-table-column align="center" prop="userWx" label="用户微信" width="100"></el-table-column>
+      <el-table-column
+        align="center"
+        prop="userHh"
+        label="户号"
+        width="120"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="jfyf"
+        label="缴费月份"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="userName"
+        label="用户名"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="userAddress"
+        label="地址"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="currentNumber"
+        label="本月指数"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="lastNumber"
+        label="上月指数"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="userPhone"
+        label="用户电话"
+        width="150"
+      ></el-table-column>
+      <el-table-column
+        align="center"
+        prop="userWx"
+        label="用户微信"
+        width="100"
+      ></el-table-column>
       <el-table-column align="center" label="用户水性" width="250">
         <template #default="{ row }">
           <div v-for="(item, index) in row.waterClassification" :key="index">
@@ -37,114 +86,216 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog class="dialog" title="新建用户" v-model="addUserDialogVisible" width="60%" top="10vh"
-      :before-close="handleClose">
+    <el-dialog
+      class="dialog"
+      title="新建用户"
+      v-model="addUserDialogVisible"
+      width="60%"
+      top="10vh"
+      :before-close="handleClose"
+    >
       <div class="dialogDiv">
         <label for="userHh">户号</label>
-        <el-input id="userHh" v-model="addUserForm.userHh" placeholder="户号"></el-input>
+        <el-input
+          id="userHh"
+          v-model="addUserForm.userHh"
+          placeholder="户号"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userName">用户名</label>
-        <el-input id="userName" v-model="addUserForm.userName" placeholder="用户名"></el-input>
+        <el-input
+          id="userName"
+          v-model="addUserForm.userName"
+          placeholder="用户名"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userAddress">地址</label>
-        <el-input id="userAddress" v-model="addUserForm.userAddress" placeholder="地址"></el-input>
+        <el-input
+          id="userAddress"
+          v-model="addUserForm.userAddress"
+          placeholder="地址"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="currentNumber">本月指数</label>
-        <el-input id="currentNumber" v-model="addUserForm.currentNumber" placeholder="用户电话"></el-input>
+        <el-input
+          id="currentNumber"
+          v-model="addUserForm.currentNumber"
+          placeholder="用户电话"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="lastNumber">上月指数</label>
-        <el-input id="lastNumber" v-model="addUserForm.lastNumber" placeholder="上月指数"></el-input>
+        <el-input
+          id="lastNumber"
+          v-model="addUserForm.lastNumber"
+          placeholder="上月指数"
+        ></el-input>
       </div>
-      <div style="
+      <div
+        style="
           margin-top: 10px;
           display: flex;
           flex-direction: column;
           width: 100%;
-        ">
-        <div style="
+        "
+      >
+        <div
+          style="
             display: flex;
             flex-direction: row;
             width: 100%;
             margin-bottom: 10px;
             align-items: center;
-          " v-for="(item, index) in addUserForm.waterClassification" :key="index">
+          "
+          v-for="(item, index) in addUserForm.waterClassification"
+          :key="index"
+        >
           <!-- TODO:改为select -->
           <div>
             <label for="waterType">水性{{ index + 1 }}</label>
-            <el-select v-model="item.waterType" placeholder="请选择水性" style="width: 300px; padding-right: 14px">
-              <el-option v-for="item in waterTypeOptions" :key="item.value" :label="item.label"
-                :value="item.value"></el-option>
+            <el-select
+              v-model="item.waterType"
+              placeholder="请选择水性"
+              style="width: 300px; padding-right: 14px"
+            >
+              <el-option
+                v-for="item in waterTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
             </el-select>
           </div>
           <div>
             <label for="waterNumber">默认用水量</label>
-            <el-input id="waterNumber" v-model="item.waterNumber" placeholder="默认用水量"
-              style="width: 300px; padding-right: 14px"></el-input>
+            <el-input
+              id="waterNumber"
+              v-model="item.waterNumber"
+              placeholder="默认用水量"
+              style="width: 300px; padding-right: 14px"
+            ></el-input>
           </div>
-          <el-button type="danger" @click="handleDeleteSubmitWaterClassification(index)" style="margin-left: 10px">
+          <el-button
+            type="danger"
+            @click="handleDeleteSubmitWaterClassification(index)"
+            style="margin-left: 10px"
+          >
             删除
           </el-button>
         </div>
       </div>
-      <el-button type="primary" @click="handleAddSubmitWaterClassification" style="margin-left: 10px">
+      <el-button
+        type="primary"
+        @click="handleAddSubmitWaterClassification"
+        style="margin-left: 10px"
+      >
         添加水性
       </el-button>
 
       <div class="dialogDiv">
         <label for="userPhone">用户电话</label>
-        <el-input id="userPhone" v-model="addUserForm.userPhone" placeholder="用户电话"></el-input>
+        <el-input
+          id="userPhone"
+          v-model="addUserForm.userPhone"
+          placeholder="用户电话"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userWx">用户微信</label>
-        <el-input id="userWx" v-model="addUserForm.userWx" placeholder="用户微信"></el-input>
+        <el-input
+          id="userWx"
+          v-model="addUserForm.userWx"
+          placeholder="用户微信"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitAddUser"> 确 定 </el-button>
       </div>
     </el-dialog>
-    <el-dialog class="dialog" title="编辑" v-model="dialogVisible" width="60%" top="8vh" :before-close="handleClose">
+    <el-dialog
+      class="dialog"
+      title="编辑"
+      v-model="dialogVisible"
+      width="60%"
+      top="8vh"
+      :before-close="handleClose"
+    >
       <div class="dialogDiv">
         <label for="userHh">户号</label>
-        <el-input id="userHh" v-model="editForm.userHh" placeholder="户号"></el-input>
+        <el-input
+          id="userHh"
+          v-model="editForm.userHh"
+          placeholder="户号"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="jfyf">缴费月份</label>
-        <el-input id="jfyf" v-model="editForm.jfyf" placeholder="缴费月份"></el-input>
+        <el-input
+          id="jfyf"
+          v-model="editForm.jfyf"
+          placeholder="缴费月份"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userName">用户名</label>
-        <el-input id="userName" v-model="editForm.userName" placeholder="用户名"></el-input>
+        <el-input
+          id="userName"
+          v-model="editForm.userName"
+          placeholder="用户名"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userAddress">地址</label>
-        <el-input id="userAddress" v-model="editForm.userAddress" placeholder="地址"></el-input>
+        <el-input
+          id="userAddress"
+          v-model="editForm.userAddress"
+          placeholder="地址"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="currentNumber">本月指数</label>
-        <el-input id="currentNumber" v-model="editForm.currentNumber" placeholder="本月指数"></el-input>
+        <el-input
+          id="currentNumber"
+          v-model="editForm.currentNumber"
+          placeholder="本月指数"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="lastNumber">上月指数</label>
-        <el-input id="lastNumber" v-model="editForm.lastNumber" placeholder="上月指数"></el-input>
+        <el-input
+          id="lastNumber"
+          v-model="editForm.lastNumber"
+          placeholder="上月指数"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <label for="userPhone">用户电话</label>
-        <el-input id="userPhone" v-model="editForm.userPhone" placeholder="用户电话"></el-input>
+        <el-input
+          id="userPhone"
+          v-model="editForm.userPhone"
+          placeholder="用户电话"
+        ></el-input>
       </div>
       <!-- {{ editForm }} -->
-      <div class="dialogDiv" style="display: flex; flex-direction: column; width: 100%">
-        <div style="
+      <div
+        class="dialogDiv"
+        style="display: flex; flex-direction: column; width: 100%"
+      >
+        <div
+          style="
             display: flex;
             flex-direction: row;
             width: 100%;
             margin-bottom: 10px;
             align-items: center;
-          " v-for="(item, index) in editForm.waterClassification" :key="index">
+          "
+          v-for="(item, index) in editForm.waterClassification"
+          :key="index"
+        >
           <label style="padding-right: 14px" for="waterType">
             水性{{ index + 1 }}
           </label>
@@ -155,25 +306,50 @@
             placeholder="水性"
             style="width: 300px; padding-right: 14px"
           ></el-input> -->
-          <el-select v-model="item.waterType" placeholder="请选择水性" style="width: 300px; padding-right: 14px">
-            <el-option v-for="item in waterTypeOptions" :key="item.value" :label="item.label"
-              :value="item.value"></el-option>
+          <el-select
+            v-model="item.waterType"
+            placeholder="请选择水性"
+            style="width: 300px; padding-right: 14px"
+          >
+            <el-option
+              v-for="item in waterTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
           </el-select>
           <label style="padding-right: 14px" for="waterNumber">
             默认用水量
           </label>
-          <el-input id="waterNumber" v-model="item.waterNumber" placeholder="默认用水量" style="width: 300px"></el-input>
-          <el-button type="danger" @click="handleDeleteWaterClassification(index)" style="margin-left: 10px">
+          <el-input
+            id="waterNumber"
+            v-model="item.waterNumber"
+            placeholder="默认用水量"
+            style="width: 300px"
+          ></el-input>
+          <el-button
+            type="danger"
+            @click="handleDeleteWaterClassification(index)"
+            style="margin-left: 10px"
+          >
             删除
           </el-button>
         </div>
-        <el-button type="primary" @click="handleAddWaterClassification" style="margin-left: 10px">
+        <el-button
+          type="primary"
+          @click="handleAddWaterClassification"
+          style="margin-left: 10px"
+        >
           添加
         </el-button>
       </div>
       <div class="dialogDiv">
         <label for="userWx">用户微信</label>
-        <el-input id="userWx" v-model="editForm.userWx" placeholder="用户微信"></el-input>
+        <el-input
+          id="userWx"
+          v-model="editForm.userWx"
+          placeholder="用户微信"
+        ></el-input>
       </div>
       <div class="dialogDiv">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -187,13 +363,19 @@
 // import { ElMessage } from "element-plus";
 import { dayjs } from "element-plus";
 import { waterTypeOptions } from "./share";
+import {
+  parseWaterClassifications,
+  type ApiResponse,
+  type EditableUser,
+  type EditableUserPayload,
+} from "@/types/water";
 
 import { onMounted, ref, type Ref } from "vue";
 let editHh: Ref<string> = ref("");
-let userInfoArr: Ref<any[]> = ref([]);
+let userInfoArr = ref<EditableUser[]>([]);
 let dialogVisible: Ref<boolean> = ref(false);
 let addUserDialogVisible: Ref<boolean> = ref(false);
-let addUserForm = ref({
+let addUserForm = ref<EditableUser>({
   userHh: "",
   jfyf: "",
   userName: "",
@@ -202,9 +384,9 @@ let addUserForm = ref({
   lastNumber: "",
   userPhone: "",
   userWx: "",
-  waterClassification: [] as any[],
+  waterClassification: [],
 });
-let editForm: Ref<any> = ref({
+let editForm = ref<EditableUser>({
   userHh: "",
   jfyf: "",
   userName: "",
@@ -218,7 +400,7 @@ let editForm: Ref<any> = ref({
       waterType: "生活一",
       waterNumber: "0",
     },
-  ] as any[],
+  ],
 });
 
 let addUser = () => {
@@ -240,7 +422,7 @@ let submitAddUser = async () => {
       },
       body: JSON.stringify(sendData),
     });
-    const data = await res.json();
+    const data = (await res.json()) as ApiResponse<unknown>;
     console.log(data.data);
     if (data.success) {
       // @ts-ignore
@@ -259,12 +441,12 @@ let submitAddUser = async () => {
 onMounted(async () => {
   try {
     const res = await fetch("http://192.168.88.109:7001/user/get_all_user");
-    const data = await res.json();
+    const data = (await res.json()) as ApiResponse<EditableUserPayload[]>;
     console.log(data.data);
-    userInfoArr.value = data.data;
-    userInfoArr.value.forEach((item) => {
-      item.waterClassification = JSON.parse(item.waterClassification);
-    });
+    userInfoArr.value = data.data.map((item) => ({
+      ...item,
+      waterClassification: parseWaterClassifications(item.waterClassification),
+    }));
   } catch (error) {
     // @ts-ignore
     ElMessage.error("获取用户信息失败");
@@ -321,9 +503,9 @@ const handleChangeInfo = async () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(sendData),
-    }
+    },
   );
-  const changeData = await changeRes.json();
+  const changeData = (await changeRes.json()) as ApiResponse<unknown>;
   console.log(changeData);
   if (changeData.success) {
     // @ts-ignore

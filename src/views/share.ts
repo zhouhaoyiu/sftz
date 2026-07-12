@@ -1,4 +1,6 @@
-const waterTypeEnum: Record<string | number, any>[] = [
+import type { WaterTypeOption } from "@/types/water";
+
+const waterTypeEnum: WaterTypeOption[] = [
   // 1: '生活用水',
   // 2: '非居民',
   // 3: '特种用水',
@@ -91,7 +93,7 @@ const mockGetUser = {
 
 const getWaterPriceUnitPrice = (
   waterType: string,
-  waterNumber: number
+  waterNumber: number,
   // population = 3
 ): number => {
   void waterNumber;

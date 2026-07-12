@@ -28,9 +28,14 @@
       <div class="userTotalUse">
         {{ query.userTotalUse }}
       </div>
-      <div class="userPriceList" v-for="(price, listIndex) in formatWaterPriceList" :style="{
+      <div
+        class="userPriceList"
+        v-for="(price, listIndex) in formatWaterPriceList"
+        :style="{
           left: 250 + listIndex * 80 + 'px',
-        }" :key="listIndex">
+        }"
+        :key="listIndex"
+      >
         <div class="userPriceItemWaterType">
           {{ price.waterType }}
         </div>
@@ -55,43 +60,50 @@
       <div class="userPriceItemWaterNumberAll">
         {{
           NP.strip(
-            formatWaterPriceList.reduce(
-              (acc: any, cur: any) => acc + cur.waterNumber,
-              0
-            )
+            formatWaterPriceList.reduce((acc, cur) => acc + cur.waterNumber, 0),
           )
         }}
       </div>
       <div class="userPriceItemWaterPriceAll">
         {{
-            NP.strip(
-              formatWaterPriceList.reduce(
-                (acc: any, cur: any) => acc + cur.waterPrice,
-                0
-              )
-            ) + "¥"
-          }}
+          NP.strip(
+            formatWaterPriceList.reduce((acc, cur) => acc + cur.waterPrice, 0),
+          ) + "¥"
+        }}
       </div>
       <div class="userPriceItemBornePriceAll">
         {{
-            NP.strip(
-              formatWaterPriceList.reduce(
-                (acc: any, cur: any) => acc + cur.waterBornePriceTotal,
-                0
-              )
-            ) + "¥"
-          }}
+          NP.strip(
+            formatWaterPriceList.reduce(
+              (acc, cur) => acc + cur.waterBornePriceTotal,
+              0,
+            ),
+          ) + "¥"
+        }}
       </div>
     </div>
-    <el-button type="primary" style="width: 100%; margin-top: 20px; height: 40px" @click="exportToImage()">
+    <el-button
+      type="primary"
+      style="width: 100%; margin-top: 20px; height: 40px"
+      @click="exportToImage()"
+    >
       导出
     </el-button>
-    <el-button v-if="1" type="" style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px" @click="saveToDb">
+    <el-button
+      v-if="1"
+      type=""
+      style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px"
+      @click="saveToDb"
+    >
       保存到数据库
     </el-button>
 
-    <el-button type="danger" plain style="width: 100%; margin-top: 20px; height: 40px; margin-left: 0"
-      @click="$router.push('/calc-waterprice')">
+    <el-button
+      type="danger"
+      plain
+      style="width: 100%; margin-top: 20px; height: 40px; margin-left: 0"
+      @click="$router.push('/calc-waterprice')"
+    >
       返回
     </el-button>
   </div>
@@ -108,36 +120,46 @@ import {
 import sftzd from "../assets/sftzd.jpg";
 import html2canvas from "html2canvas";
 import NP from "number-precision";
+import type { WaterPriceInput } from "@/types/water";
+
+interface FormattedWaterPrice {
+  waterType: string;
+  waterNumber: number;
+  waterUnitPrice: number;
+  waterPrice: number;
+  waterBornePrice: number;
+  waterBornePriceTotal: number;
+}
 
 const $router = useRouter();
 const $route = useRoute();
 
 const query = $route.query;
 
-const formatWaterPriceList = JSON.parse(query.waterPriceList as string).map(
-  (item: { waterType: number; waterNumber: number }) => {
-    return {
-      waterType: waterTypeEnum[item.waterType].label,
-      waterNumber: item.waterNumber,
-      // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
-      waterUnitPrice: getWaterPriceUnitPrice(
+const formatWaterPriceList: FormattedWaterPrice[] = (
+  JSON.parse(query.waterPriceList as string) as WaterPriceInput[]
+).map((item) => {
+  return {
+    waterType: waterTypeEnum[item.waterType].label,
+    waterNumber: item.waterNumber,
+    // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
+    waterUnitPrice: getWaterPriceUnitPrice(
+      waterTypeEnum[item.waterType].label,
+      item.waterNumber,
+    ),
+    waterPrice: NP.strip(
+      getWaterPriceUnitPrice(
         waterTypeEnum[item.waterType].label,
-        item.waterNumber
-      ),
-      waterPrice: NP.strip(
-        getWaterPriceUnitPrice(
-          waterTypeEnum[item.waterType].label,
-          item.waterNumber
-        ) * item.waterNumber
-      ),
-      waterBornePrice: getWaterBornePrice(waterTypeEnum[item.waterType].label),
-      waterBornePriceTotal: NP.strip(
-        getWaterBornePrice(waterTypeEnum[item.waterType].label) *
-        item.waterNumber
-      ),
-    };
-  }
-);
+        item.waterNumber,
+      ) * item.waterNumber,
+    ),
+    waterBornePrice: getWaterBornePrice(waterTypeEnum[item.waterType].label),
+    waterBornePriceTotal: NP.strip(
+      getWaterBornePrice(waterTypeEnum[item.waterType].label) *
+        item.waterNumber,
+    ),
+  };
+});
 
 console.log(JSON.stringify(formatWaterPriceList, null, 2));
 const exportToImage = () => {
@@ -170,7 +192,6 @@ const saveToDb = async () => {
   const data = await res.json();
   if (data.success) {
     // @ts-ignore
-    // eslint-disable-next-line no-undef
     ElMessage.success("保存成功");
   }
 };

@@ -13,15 +13,18 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import readXlsxFile from "read-excel-file/browser";
-let excelInfo = ref<any>(null);
-const importExcel = async (e: any) => {
-  const file = e.target.files[0];
+import { readSheet } from "read-excel-file/browser";
+let excelInfo = ref<Record<string, unknown>[] | null>(null);
+const importExcel = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file) return;
-  const rows = await readXlsxFile(file);
+  const rows = await readSheet(file);
   const [headers = [], ...body] = rows;
   const json = body.map((row) =>
-    Object.fromEntries(headers.map((header, index) => [String(header ?? index), row[index]])),
+    Object.fromEntries(
+      headers.map((header, index) => [String(header ?? index), row[index]]),
+    ),
   );
   excelInfo.value = json;
   console.log(json);

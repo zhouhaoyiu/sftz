@@ -4,6 +4,12 @@ import { type Ref, ref, onMounted, computed } from "vue";
 import { dayjs } from "element-plus";
 import { useRouter } from "vue-router";
 import { waterTypeEnum } from "./share";
+import {
+  parseWaterClassifications,
+  type ApiResponse,
+  type BillingUser,
+  type WaterPriceInput,
+} from "@/types/water";
 
 const router = useRouter();
 let isSearch = ref(false);
@@ -21,7 +27,7 @@ let searchAndCalc = computed(() => {
 const getWaterPrice = (
   waterType: string,
   waterNumber: number,
-  population = 3
+  population = 3,
 ) => {
   // console.log(waterType, waterNumber, population);
   switch (waterType) {
@@ -78,7 +84,7 @@ const getWaterPrice = (
   }
 };
 
-let waterPriceList: Ref<Record<string, any>[]> = ref([
+let waterPriceList: Ref<WaterPriceInput[]> = ref([
   {
     waterType: 2,
     waterNumber: 0,
@@ -100,7 +106,7 @@ let waterPriceList: Ref<Record<string, any>[]> = ref([
  * waterClassification     用水分类
  */
 
-let userInfo: Ref<Record<string, any>> = ref({
+let userInfo: Ref<BillingUser> = ref({
   userId: 0,
   userHh: "",
   jfyf: "",
@@ -112,7 +118,7 @@ let userInfo: Ref<Record<string, any>> = ref({
   userPopulation: 0,
   userPhone: "",
   userWx: "",
-  waterClassification: 0,
+  waterClassification: "",
   userTotalUse: 0,
 });
 
@@ -121,7 +127,7 @@ let userTotalPrice: Ref<number> = ref(0);
 
 onMounted(async () => {
   const population = document.getElementsByClassName(
-    "el-input__inner"
+    "el-input__inner",
   )[0]! as HTMLInputElement;
   if (population) {
     population.focus();
@@ -133,16 +139,6 @@ onMounted(async () => {
   // ],
   // console.log(mockGetUser.waterClassification);
   waterPriceList.value = [];
-  // mockGetUser.waterClassification.forEach((item: any) => {
-  //   console.log(item);
-  //   waterPriceList.value.push({
-  //     waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
-  //       ?.value,
-  //     waterNumber: Number(item.waterNumber),
-  //     population: 3,
-  //   });
-  // });
-  // console.log(waterPriceList.value);
 });
 
 let calcWaterPriceAndWrite = () => {
@@ -155,15 +151,15 @@ let calcWaterPriceAndWrite = () => {
         getWaterPrice(
           waterTypeEnum[waterPrice.waterType].label,
           waterPrice.waterNumber,
-          waterPrice.population
-        ) * 100
+          waterPrice.population,
+        ) * 100,
       ) /
         100,
-    0
+    0,
   );
   totalUse = waterPriceList.value.reduce(
     (total, waterPrice) => total + waterPrice.waterNumber,
-    0
+    0,
   );
   userInfo.value.userTotalUse = totalUse;
   // 本次指数 = 上次指数 + 本次用水量
@@ -175,27 +171,29 @@ let calcWaterPriceAndWrite = () => {
 const fetchUserInfo = async () => {
   try {
     const res = await fetch(
-      `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`
+      `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`,
     );
-    const data = await res.json();
+    const data = (await res.json()) as ApiResponse<BillingUser | null>;
     console.log(data);
     if (data.data == null) {
       // @ts-ignore
       ElMessage.error("未查询到该用户信息");
       return;
     }
-    userInfo.value = data.data;
+    const user = data.data;
+    userInfo.value = user;
     // 当前月份 如2023-03
     userInfo.value.jfyf = dayjs().format("YYYY-MM");
     isSearch.value = true;
     waterPriceList.value = [];
-    JSON.parse(data.data.waterClassification).forEach((item: any) => {
+    parseWaterClassifications(user.waterClassification).forEach((item) => {
       console.log(item);
       waterPriceList.value.push({
-        waterType: waterTypeEnum.find((item2) => item2.label === item.waterType)
-          ?.value,
+        waterType:
+          waterTypeEnum.find((item2) => item2.label === item.waterType)
+            ?.value ?? 0,
         waterNumber: Number(item.waterNumber),
-        population: data.data.userPopulation,
+        population: user.userPopulation,
       });
     });
   } catch (e) {
@@ -238,7 +236,7 @@ const print = () => {
       <input
         type="file"
         id="importFile"
-        @change="importFile(($event!.target! as any).files[0])"
+        @change="importFile(($event.target as HTMLInputElement).files?.[0])"
       />
     </div> -->
     <div>
@@ -397,8 +395,8 @@ const print = () => {
                 getWaterPrice(
                   waterTypeEnum[waterPrice.waterType].label,
                   waterPrice.waterNumber,
-                  waterPrice.population
-                ) * 100
+                  waterPrice.population,
+                ) * 100,
               ) / 100
             }}
           </b>
