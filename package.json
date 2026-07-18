@@ -18,7 +18,7 @@
     "number-precision": "^1.6.0",
     "pinia": "^4.0.2",
     "read-excel-file": "^9.3.2",
-    "vue": "^3.5.39",
+    "vue": "^3.5.40",
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
