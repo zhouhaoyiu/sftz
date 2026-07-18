@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2(@vue/devtools-api@8.1.5)(typescript@7.0.2)(vue@3.5.39(typescript@7.0.2))
       read-excel-file:
-        specifier: ^9.3.1
-        version: 9.3.1
+        specifier: ^9.3.2
+        version: 9.3.2
       vue:
         specifier: ^3.5.39
         version: 3.5.39(typescript@7.0.2)
@@ -1382,8 +1382,8 @@ packages:
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
-  read-excel-file@9.3.1:
-    resolution: {integrity: sha512-yzC1vJ/yl3PGJfCDrOI6/rBagF0bRm/CK1NTNXYdomB+13mDB9SFyoRibsDXxDAFrwCANfuRqzuUWDljkkSEuQ==}
+  read-excel-file@9.3.2:
+    resolution: {integrity: sha512-+zgqv/f6sll72omYA5kmlKf9W8ws7L+E/ZfhYpr8jJCFvOY5urGf4AnbwCIrtIUOFsT4LrpqYeMSleHQRJNnBg==}
     engines: {node: '>=18'}
 
   readdirp@5.0.0:
@@ -1404,8 +1404,8 @@ packages:
     engines: {node: '>=20.19.0'}
     hasBin: true
 
-  saxen@11.0.2:
-    resolution: {integrity: sha512-WDb4gqac8uiJzOdOdVpr9NWh9NrJMm7Brn5GX2Poj+mjE/QTXqYQENr8T/mom54dDDgbd3QjwTg23TRHYiWXRA==}
+  saxen@11.1.0:
+    resolution: {integrity: sha512-GOxBOAmiWVAytOHBuMlgFMZ4MAk+2Ny5QJpzM9I4IozfPLXq3FsDdIHNviTQGZGIx7G2mBkA+uySiJlYmSU1Gg==}
     engines: {node: '>= 20.12'}
 
   saxes@6.0.0:
@@ -2877,10 +2877,10 @@ snapshots:
 
   quansync@0.2.11: {}
 
-  read-excel-file@9.3.1:
+  read-excel-file@9.3.2:
     dependencies:
       fflate: 0.8.3
-      saxen: 11.0.2
+      saxen: 11.1.0
       unzipper-esm: 0.13.2
 
   readdirp@5.0.0: {}
@@ -2916,7 +2916,7 @@ snapshots:
     optionalDependencies:
       '@parcel/watcher': 2.5.6
 
-  saxen@11.0.2: {}
+  saxen@11.1.0: {}
 
   saxes@6.0.0:
     dependencies:
