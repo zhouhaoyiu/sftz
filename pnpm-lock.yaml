@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2(@vue/devtools-api@8.1.5)(typescript@7.0.2)(vue@3.5.40(typescript@7.0.2))
       read-excel-file:
-        specifier: ^9.3.2
-        version: 9.3.2
+        specifier: ^9.3.3
+        version: 9.3.3
       vue:
         specifier: ^3.5.40
         version: 3.5.40(typescript@7.0.2)
@@ -1348,6 +1348,10 @@ packages:
     resolution: {integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.20:
+    resolution: {integrity: sha512-lW616l85ucIQL+FocMmL7pQFPqBmwejrCMg+iPxyImlrANNJG9NHq/RkyCZopDhd8C3LA03PHRJDjkbGu8vvug==}
+    engines: {node: ^10 || ^12 || >=14}
+
   prettier@3.9.5:
     resolution: {integrity: sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg==}
     engines: {node: '>=14'}
@@ -1360,8 +1364,8 @@ packages:
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
-  read-excel-file@9.3.2:
-    resolution: {integrity: sha512-+zgqv/f6sll72omYA5kmlKf9W8ws7L+E/ZfhYpr8jJCFvOY5urGf4AnbwCIrtIUOFsT4LrpqYeMSleHQRJNnBg==}
+  read-excel-file@9.3.3:
+    resolution: {integrity: sha512-Eogrq3sqre8IP28bSil9+0yUfZB67o//h5w3R0zdOznkhNAmRJGHz7z38oH8NC5AWO78YG1TXVHGyJZZ2PzZUw==}
     engines: {node: '>=18'}
 
   readdirp@5.0.0:
@@ -2394,7 +2398,7 @@ snapshots:
       '@vue/shared': 3.5.40
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.19
+      postcss: 8.5.20
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.40':
@@ -2833,13 +2837,19 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  postcss@8.5.20:
+    dependencies:
+      nanoid: 3.3.16
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
   prettier@3.9.5: {}
 
   punycode@2.3.1: {}
 
   quansync@0.2.11: {}
 
-  read-excel-file@9.3.2:
+  read-excel-file@9.3.3:
     dependencies:
       fflate: 0.8.3
       saxen: 11.1.0
