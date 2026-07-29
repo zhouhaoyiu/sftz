@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2(@vue/devtools-api@8.1.5)(typescript@7.0.2)(vue@3.5.40(typescript@7.0.2))
       read-excel-file:
-        specifier: ^9.3.4
-        version: 9.3.4
+        specifier: ^9.3.5
+        version: 9.3.5
       vue:
         specifier: ^3.5.40
         version: 3.5.40(typescript@7.0.2)
@@ -1351,8 +1351,8 @@ packages:
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
-  read-excel-file@9.3.4:
-    resolution: {integrity: sha512-/Vdzh+951TFXKQvz7Hfq4Rh1b7nb4lVZ8i5Bm/f279EqNiI2+WK124yV2/ryrXenA1fhGPfAgiY9K3J1ZMuZtA==}
+  read-excel-file@9.3.5:
+    resolution: {integrity: sha512-A4EbaJxFrqzBNdU4Lw0g6wzme3m7ywW3MsPLLuBiGPUWJbxETyVDT5vyqsOnl/AW48OGM4MGoOgKFsEZNMMVVw==}
     engines: {node: '>=18'}
 
   readdirp@5.0.0:
@@ -1373,8 +1373,8 @@ packages:
     engines: {node: '>=20.19.0'}
     hasBin: true
 
-  saxen@11.1.0:
-    resolution: {integrity: sha512-GOxBOAmiWVAytOHBuMlgFMZ4MAk+2Ny5QJpzM9I4IozfPLXq3FsDdIHNviTQGZGIx7G2mBkA+uySiJlYmSU1Gg==}
+  saxen@11.1.1:
+    resolution: {integrity: sha512-J4BkmJFaM7VgE7pgkFGsNEcqqM3h7+Mz80vfLWFhx7uNOCOXIu6LLjQHYWNejdst3pf/3JUaBIG9+pkk1umlow==}
     engines: {node: '>= 20.12'}
 
   saxes@6.0.0:
@@ -1528,8 +1528,8 @@ packages:
       webpack:
         optional: true
 
-  unzipper-esm@0.13.2:
-    resolution: {integrity: sha512-lt8GtgDYV8YcAFZNQuLyR2QvHI8C/TstpgsdjUn9ZxiWLJgn+e5uW6DsO3e/HUJVuWD57ZLLFMZ9xk26tePuHQ==}
+  unzipper-esm@0.13.3:
+    resolution: {integrity: sha512-LUO6VZ6fCzkDbdMev0/fOhoIeVGKaOkTIOoYxVLE0SQjfvmAHK+oywl7lfhloSZIsdGJ25mJ18Mtd9CyTASjrA==}
     engines: {node: '>=8.0.0'}
 
   update-browserslist-db@1.2.3:
@@ -1681,6 +1681,10 @@ packages:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
     engines: {node: '>=8'}
     hasBin: true
+
+  worker-f@0.1.12:
+    resolution: {integrity: sha512-yl6HhVOmONDL8ancm/KHX2gP9ggRPOPPN+2zuMDFsl+hMS5ODgnFpA0EtUCdM1eQ096tjVq9qe8ZJxN340vr8Q==}
+    engines: {node: '>=12'}
 
   xml-name-validator@5.0.0:
     resolution: {integrity: sha512-EvGK8EJ3DhaHfbRlETOWAS5pO9MZITeauHKJyb8wyajUfQUenkIg2MvLDTZ4T/TgIcm3HU0TFBgWWboAZ30UHg==}
@@ -2831,11 +2835,12 @@ snapshots:
 
   quansync@0.2.11: {}
 
-  read-excel-file@9.3.4:
+  read-excel-file@9.3.5:
     dependencies:
       fflate: 0.8.3
-      saxen: 11.1.0
-      unzipper-esm: 0.13.2
+      saxen: 11.1.1
+      unzipper-esm: 0.13.3
+      worker-f: 0.1.12
 
   readdirp@5.0.0: {}
 
@@ -2870,7 +2875,7 @@ snapshots:
     optionalDependencies:
       '@parcel/watcher': 2.6.0
 
-  saxen@11.1.0: {}
+  saxen@11.1.1: {}
 
   saxes@6.0.0:
     dependencies:
@@ -3029,7 +3034,7 @@ snapshots:
       rolldown: 1.1.5
       vite: 8.1.5(@types/node@26.1.1)(sass@1.102.0)(yaml@2.9.0)
 
-  unzipper-esm@0.13.2:
+  unzipper-esm@0.13.3:
     dependencies:
       graceful-fs: 4.2.11
       node-int64: 0.4.0
@@ -3162,6 +3167,8 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  worker-f@0.1.12: {}
 
   xml-name-validator@5.0.0: {}
 
