@@ -12,7 +12,7 @@
     "type-check": "tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
-    "autoprefixer": "^10.5.4",
+    "autoprefixer": "^10.5.5",
     "element-plus": "^2.14.5",
     "html2canvas": "^1.4.1",
     "number-precision": "^1.6.0",
