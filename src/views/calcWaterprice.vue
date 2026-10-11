@@ -1,560 +1,289 @@
-<!-- eslint-disable no-undef -->
-<script lang="ts" setup>
-import { type Ref, ref, onMounted, computed } from "vue";
-import { dayjs } from "element-plus";
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
-import { waterTypeEnum } from "./share";
-import {
-  parseWaterClassifications,
-  type ApiResponse,
-  type BillingUser,
-  type WaterPriceInput,
-} from "@/types/water";
-
+import { api } from "../api";
+import { parseWaterClassifications, type BillingUser } from "../types/water";
+import { type Bill, money } from "../types/bill";
 const router = useRouter();
-let isSearch = ref(false);
-let isCalc = ref(false);
-
-let searchAndCalc = computed(() => {
-  return isSearch.value && isCalc.value;
+const household = ref(""),
+  user = ref<BillingUser | null>(null),
+  busy = ref(false),
+  error = ref("");
+const current = ref(0),
+  population = ref(3),
+  period = ref(new Date().toLocaleDateString("sv-SE").slice(0, 7));
+const categories = ref<string[]>([]),
+  lines = ref<{ type: string; volume: number }[]>([]),
+  history = ref<Bill[]>([]);
+const bill = ref<Bill | null>(null),
+  requestId = ref(crypto.randomUUID());
+let queryVersion = 0;
+const usage = computed(() =>
+  user.value
+    ? Math.round((current.value - Number(user.value.lastNumber)) * 1000) / 1000
+    : 0,
+);
+const assigned = computed(
+  () =>
+    Math.round(
+      lines.value.reduce((sum, line) => sum + Number(line.volume), 0) * 1000,
+    ) / 1000,
+);
+watch(household, () => {
+  queryVersion++;
+  user.value = null;
+  bill.value = null;
+  history.value = [];
 });
-
-/**
- * @param waterType 用水性质
- * @param waterNumber 用水量
- * @param population 人口数
- */
-const getWaterPrice = (
-  waterType: string,
-  waterNumber: number,
-  population = 3,
-) => {
-  // console.log(waterType, waterNumber, population);
-  switch (waterType) {
-    case "生活一":
-      return (waterNumber * 24) / 10;
-    case "生活二":
-      return (waterNumber * 24) / 10;
-    /**
-     * 居民一 阶梯水价
-     * 0-108(含) 区间内单价2.3元 一阶水
-     * 109-161(含) 区间内单价4.6元 二阶水
-     * 161以上 区间内单价6.9元 三阶水
-     *
-     * 一户人数在3人及以下，按此标准执行。
-     * 人口数每增加一人，一阶增加36立方米，二阶增加18立方米。
-     * */
-    case "居民一":
-      if (population <= 3) {
-        if (waterNumber <= 108) {
-          return waterNumber * 2.3;
-        } else if (waterNumber <= 161) {
-          return 248.4 + (waterNumber - 108) * 4.6;
-        } else {
-          return 248.4 + 243.8 + (waterNumber - 161) * 6.9;
-        }
-      } else {
-        if (waterNumber <= 108 + (population - 3) * 36) {
-          return waterNumber * 2.3;
-        } else if (waterNumber <= 161 + (population - 3) * 54) {
-          return (
-            (108 + (population - 3) * 36) * 2.3 +
-            (waterNumber - 108 - (population - 3) * 36) * 4.6
-          );
-        } else {
-          return (
-            (108 + (population - 3) * 36) * 2.3 +
-            (53 + (population - 3) * 18) * 4.6 +
-            (waterNumber - 161 - (population - 3) * 54) * 6.9
-          );
-        }
-      }
-    case "居民二":
-      return waterNumber * 2.3;
-    case "非居民一":
-      return waterNumber * 4;
-    case "非居民二":
-      return waterNumber * 4;
-    case "特种一":
-      return waterNumber * 48;
-    case "非居民四":
-      return waterNumber * 3.2;
-    default:
-      return 0;
-  }
-};
-
-let waterPriceList: Ref<WaterPriceInput[]> = ref([
-  {
-    waterType: 2,
-    waterNumber: 0,
-    population: 3,
+watch(
+  [current, population, period, lines],
+  () => {
+    requestId.value = crypto.randomUUID();
+    bill.value = null;
   },
-]);
-/**
- * userId                  用户ID
- * userHh                  户号
- * jfyf                    缴费月份
- * userName                用户名
- * userAddress             地址
- * currentNumber           本次指数
- * lastNumber              上次指数
- * latestPaymentDate       最迟缴费日期
- * userPopulation          用户人数
- * userPhone               用户电话
- * userWx                  用户微信
- * waterClassification     用水分类
- */
-
-let userInfo: Ref<BillingUser> = ref({
-  userId: 0,
-  userHh: "",
-  jfyf: "",
-  userName: "",
-  userAddress: "",
-  currentNumber: 0,
-  lastNumber: 0,
-  latestPaymentDate: "",
-  userPopulation: 0,
-  userPhone: "",
-  userWx: "",
-  waterClassification: "",
-  userTotalUse: 0,
-});
-
-// 总水费
-let userTotalPrice: Ref<number> = ref(0);
-
-onMounted(async () => {
-  const population = document.getElementsByClassName(
-    "el-input__inner",
-  )[0]! as HTMLInputElement;
-  if (population) {
-    population.focus();
-  }
-
-  // waterClassification: [
-  //   { waterType: "生活一", waterNumber: "0" },
-  //   { waterType: "特种一", waterNumber: 50 },
-  // ],
-  // console.log(mockGetUser.waterClassification);
-  waterPriceList.value = [];
-});
-
-let calcWaterPriceAndWrite = () => {
-  let waterPrice = 0;
-  let totalUse = 0;
-  waterPrice = waterPriceList.value.reduce(
-    (total, waterPrice) =>
-      total +
-      Math.round(
-        getWaterPrice(
-          waterTypeEnum[waterPrice.waterType].label,
-          waterPrice.waterNumber,
-          waterPrice.population,
-        ) * 100,
-      ) /
-        100,
-    0,
-  );
-  totalUse = waterPriceList.value.reduce(
-    (total, waterPrice) => total + waterPrice.waterNumber,
-    0,
-  );
-  userInfo.value.userTotalUse = totalUse;
-  // 本次指数 = 上次指数 + 本次用水量
-  userInfo.value.currentNumber = userInfo.value.lastNumber + totalUse;
-  userTotalPrice.value = waterPrice;
-  isCalc.value = true;
-};
-
-const fetchUserInfo = async () => {
+  { deep: true },
+);
+async function lookup() {
+  if (!household.value.trim()) return;
+  const version = ++queryVersion,
+    hh = household.value.trim();
+  user.value = null;
+  bill.value = null;
+  history.value = [];
+  error.value = "";
+  busy.value = true;
   try {
-    const res = await fetch(
-      `http://192.168.88.109:7001/user/get_user?userHh=${userInfo.value.userHh}`,
+    const result = await api<BillingUser | null>(
+      "/user/get_user?userHh=" + encodeURIComponent(hh),
     );
-    const data = (await res.json()) as ApiResponse<BillingUser | null>;
-    console.log(data);
-    if (data.data == null) {
-      // @ts-ignore
-      ElMessage.error("未查询到该用户信息");
-      return;
-    }
-    const user = data.data;
-    userInfo.value = user;
-    // 当前月份 如2023-03
-    userInfo.value.jfyf = dayjs().format("YYYY-MM");
-    isSearch.value = true;
-    waterPriceList.value = [];
-    parseWaterClassifications(user.waterClassification).forEach((item) => {
-      console.log(item);
-      waterPriceList.value.push({
-        waterType:
-          waterTypeEnum.find((item2) => item2.label === item.waterType)
-            ?.value ?? 0,
-        waterNumber: Number(item.waterNumber),
-        population: user.userPopulation,
-      });
-    });
+    if (version !== queryVersion) return;
+    if (!result || result.userHh !== hh) throw new Error("未找到该户");
+    user.value = result;
+    current.value = Number(result.currentNumber);
+    population.value = result.userPopulation || 3;
+    const classified = parseWaterClassifications(result.waterClassification);
+    lines.value = classified.length
+      ? classified.map((line) => ({
+          type: line.waterType,
+          volume: Number(line.waterNumber),
+        }))
+      : [{ type: "居民一", volume: Math.max(0, usage.value) }];
+    const saved = await api<Bill[]>(
+      "/billing/history?userHh=" + encodeURIComponent(hh),
+    );
+    if (version === queryVersion) history.value = saved;
   } catch (e) {
-    console.log(e);
-    // @ts-ignore
-    ElMessage.error("查询用户信息失败");
+    if (version === queryVersion)
+      error.value = e instanceof Error ? e.message : "查询失败";
+  } finally {
+    if (version === queryVersion) busy.value = false;
   }
-};
-
-const print = () => {
-  router.push({
-    path: "/print-page",
-    query: {
-      userHh: userInfo.value.userHh,
-      jfyf: userInfo.value.jfyf,
-      userName: userInfo.value.userName,
-      userAddress: userInfo.value.userAddress,
-      currentNumber: userInfo.value.currentNumber,
-      lastNumber: userInfo.value.lastNumber,
-      latestPaymentDate: userInfo.value.latestPaymentDate,
-      userPopulation: userInfo.value.userPopulation,
-      userPhone: userInfo.value.userPhone,
-      userWx: userInfo.value.userWx,
-      waterClassification: userInfo.value.waterClassification,
-      userTotalUse: userInfo.value.userTotalUse,
-      userTotalPrice: userTotalPrice.value,
-
-      waterPriceList: JSON.stringify(waterPriceList.value),
-    },
-  });
-};
+}
+async function createBill() {
+  if (!user.value || busy.value) return;
+  if (usage.value < 0 || assigned.value !== usage.value) {
+    error.value = "分类用量合计须与本期用量一致";
+    return;
+  }
+  busy.value = true;
+  error.value = "";
+  try {
+    bill.value = await api<Bill>("/billing/bill", {
+      method: "POST",
+      body: JSON.stringify({
+        id: requestId.value,
+        userHh: user.value.userHh,
+        period: period.value,
+        currentNumber: Number(current.value),
+        expectedLastNumber: Number(user.value.lastNumber),
+        expectedCurrentNumber: Number(user.value.currentNumber),
+        population: Number(population.value),
+        lines: lines.value.map((line) => ({
+          type: line.type,
+          volume: Number(line.volume),
+        })),
+      }),
+    });
+    history.value = [
+      bill.value,
+      ...history.value.filter((item) => item.id !== bill.value!.id),
+    ];
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "账单未生成";
+  } finally {
+    busy.value = false;
+  }
+}
+function print(id: string) {
+  router.push({ path: "/print-page", query: { id } });
+}
+onMounted(async () => {
+  try {
+    categories.value = (
+      await api<{ categories: string[] }>("/billing/tariffs")
+    ).categories;
+  } catch {
+    error.value = "计价配置加载失败";
+  }
+});
 </script>
-
 <template>
-  <div class="userInfo">
-    <h2>信息查询</h2>
-    <!-- 导入excel文件 -->
-    <!-- <div>
-      <label for="importFile">导入excel文件</label>
-      <input
-        type="file"
-        id="importFile"
-        @change="importFile(($event.target as HTMLInputElement).files?.[0])"
-      />
-    </div> -->
-    <div>
-      <label for="population">户号</label>
-      <el-input
-        @keyup.enter="fetchUserInfo"
-        v-model="userInfo.userHh"
-        id="population"
-        style="width: 150px"
-      />
-    </div>
-    <div>
-      <!-- 缴费月份 -->
-      <label for="jfyf">缴费月份</label>
-      <!-- <el-input v-model="userInfo.jfyf" id="jfyf" style="width: 100px" /> -->
-      <el-date-picker
-        v-model="userInfo.jfyf"
-        type="month"
-        placeholder="选择月份"
-        style="width: 150px"
-      />
-    </div>
-    <div>
-      <!-- 用户名 -->
-      <label for="userName">用户名</label>
-      <!-- <el-input
-        v-model="userInfo.userName"
-        id="userName"
-        style="width: 100px"
-      /> -->
-      {{ userInfo.userName || "请输入户号后查询" }}
-    </div>
-    <div style="display: flex; align-items: center">
-      <!-- 地址 -->
-      <label for="userAddress">地址</label>
-      <!-- <el-input
-        type="textarea"
-        v-model="userInfo.userAddress"
-        id="userAddress"
-        style="width: 150px"
-      /> -->
-      {{ userInfo.userAddress || "请输入户号后查询" }}
-    </div>
-    <div>
-      <!-- 本次指数 -->
-      <label for="currentNumber">本次指数</label>
-      <!-- <el-input
-        v-model="userInfo.currentNumber"
-        id="currentNumber"
-        style="width: 100px"
-      /> -->
-      {{ userInfo.currentNumber }}
-    </div>
-    <div>
-      <!-- 上次指数 -->
-      <label for="lastNumber">上次指数</label>
-      <!-- <el-input
-        v-model="userInfo.lastNumber"
-        id="lastNumber"
-        style="width: 100px"
-      /> -->
-      {{ userInfo.lastNumber }}
-    </div>
-    <div>
-      <!-- 最迟缴费日期 -->
-      <label for="latestPaymentDate">最迟缴费日期</label>
-      {{ userInfo.latestPaymentDate || "请输入户号后查询" }}
-    </div>
-    <div>
-      <!-- 总用量 -->
-      <label for="userTotalUse">总用量</label>
-      <el-input
-        disabled
-        :model-value="userInfo.userTotalUse || 0"
-        id="userTotalUse"
-        style="width: 150px"
-      />
-    </div>
-    <div>
-      <!-- 用户人数 -->
-      <label for="userPopulation">用户人数</label>
-      {{ userInfo.userPopulation }}
-    </div>
-    <div>
-      <!-- 用户电话 -->
-      <label for="userPhone">用户电话</label>
-      <!-- <el-input
-        v-model="userInfo.userPhone"
-        id="userPhone"
-        style="width: 150px"
-      /> -->
-      {{ userInfo.userPhone || "请输入户号后查询" }}
-    </div>
-
-    <div>
-      <!-- 用户微信 -->
-      <label for="userWx">用户微信</label>
-      <!-- <el-input v-model="userInfo.userWx" id="userWx" style="width: 150px" /> -->
-      {{ userInfo.userWx || "请输入户号后查询" }}
-    </div>
-    <div class="fetchUserInfo" style="width: 100%">
-      <el-button style="width: 100%" type="primary" @click="fetchUserInfo">
-        查询
-      </el-button>
-    </div>
-  </div>
-  <div class="calcWaterprices" v-if="isSearch">
-    <div
-      class="calcWaterprice"
-      v-for="(waterPrice, waterPriceIndex) in waterPriceList"
-      :key="waterPriceIndex"
-    >
-      <div class="waterType">
-        <label for="waterNumber">用水性质</label>
-        <el-select
-          style="width: 150px"
-          id="waterNumber"
-          v-model="waterPrice.waterType"
-        >
-          <el-option
-            v-for="waterType in waterTypeEnum"
-            :value="waterType.value"
-            :label="waterType.label"
-            :key="waterType.value"
-          ></el-option>
-        </el-select>
+  <section class="billing-page">
+    <header class="page-top">
+      <div>
+        <p class="eyebrow">营业业务</p>
+        <h1>水费通知</h1>
       </div>
-      <div class="waterNumber">
-        <label for="waterNumber">用水量</label>
-        <el-input-number
-          id="waterNumber"
-          style="width: 130px"
-          :min="0"
-          v-model="waterPrice.waterNumber"
-        />
-      </div>
-      <!-- 如果是居民一增加人口数，默认为3 -->
-      <!-- <div class="population" v-if="waterPrice.waterType === 2">
-        <label for="population">人口数</label>
-        <el-input-number
-          id="population"
-          style="width: 100px"
-          :min="0"
-          v-model="waterPrice.population"
-        />
-      </div> -->
-      <div class="waterPrice">
-        <div>用水性质：{{ waterTypeEnum[waterPrice.waterType].label }}</div>
-        <div>用水量：{{ waterPrice.waterNumber }}</div>
-        <div>
-          <b>
-            水费：
-            {{
-              // 避免出现小数点后面很多位
-              Math.round(
-                getWaterPrice(
-                  waterTypeEnum[waterPrice.waterType].label,
-                  waterPrice.waterNumber,
-                  waterPrice.population,
-                ) * 100,
-              ) / 100
-            }}
-          </b>
+      <span class="muted">{{ period }}</span>
+    </header>
+    <form class="lookup" @submit.prevent="lookup">
+      <label
+        >客户户号<input
+          v-model.trim="household"
+          :disabled="busy"
+          placeholder="输入户号"
+          autocomplete="off"
+          required /></label
+      ><button class="primary" :disabled="busy">
+        {{ busy ? "查询中" : "查询" }}
+      </button>
+    </form>
+    <p v-if="error" class="error" role="alert">{{ error }}</p>
+    <div v-if="user" class="billing-grid">
+      <section class="customer">
+        <h2>{{ user.userName }}</h2>
+        <p class="household">{{ user.userHh }}</p>
+        <p>{{ user.userAddress }}</p>
+        <dl>
+          <dt>上次读数</dt>
+          <dd>{{ user.lastNumber }} m³</dd>
+          <dt>人口</dt>
+          <dd>{{ user.userPopulation }} 人</dd>
+        </dl>
+      </section>
+      <section class="readings">
+        <div class="form-row">
+          <label
+            >账单月份<input
+              v-model="period"
+              type="month"
+              :disabled="busy" /></label
+          ><label
+            >本次读数<input
+              v-model.number="current"
+              type="number"
+              :min="user.lastNumber"
+              step="0.001"
+              :disabled="busy" /></label
+          ><label
+            >计价人口<input
+              v-model.number="population"
+              type="number"
+              min="1"
+              max="100"
+              :disabled="busy"
+          /></label>
         </div>
+        <div class="usage-band">
+          <span>本期用量</span><strong>{{ usage }} <small>m³</small></strong
+          ><span>已分配 {{ assigned }} m³</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>用水性质</th>
+                <th>用量 / m³</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(line, index) in lines" :key="index">
+                <td>
+                  <select v-model="line.type" :disabled="busy">
+                    <option v-for="type in categories" :key="type">
+                      {{ type }}
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    v-model.number="line.volume"
+                    type="number"
+                    min="0"
+                    step="0.001"
+                    :disabled="busy"
+                    :aria-label="'第' + (index + 1) + '项用量'"
+                  />
+                </td>
+                <td>
+                  <button
+                    :disabled="busy || lines.length === 1"
+                    @click="lines.splice(index, 1)"
+                  >
+                    移除
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button
+            :disabled="busy || lines.length >= 20"
+            @click="lines.push({ type: categories[0], volume: 0 })"
+          >
+            添加分类</button
+          ><button
+            class="primary"
+            :disabled="busy || !categories.length"
+            @click="createBill"
+          >
+            {{ busy ? "正在保存" : "生成通知单" }}
+          </button>
+        </div>
+      </section>
+    </div>
+    <div v-else-if="!busy" class="empty">暂无客户资料</div>
+    <section v-if="bill" class="bill-result">
+      <div>
+        <span>应收合计</span><strong>¥ {{ money(bill.totalCents) }}</strong>
+        <p>
+          水费 {{ money(bill.waterCents) }} 元 · 污水处理费
+          {{ money(bill.sewageCents) }} 元
+        </p>
       </div>
-      <!-- <div class="addWaterPrice">
-        <el-button
-          type="danger"
-          @click="waterPriceList.splice(waterPriceIndex, 1)"
-          >删除
-        </el-button>
-      </div> -->
-    </div>
-    <div>
-      <!-- <el-button
-        type="primary"
-        @click="waterPriceList.push({ waterType: 1, waterNumber: 0 })"
-        >添加
-      </el-button> -->
-      <el-button type="primary" @click="calcWaterPriceAndWrite">计算</el-button>
-    </div>
-    <h1>总水费：{{ userTotalPrice }}</h1>
-    <div>
-      <!-- 打印 -->
-      <el-button v-if="searchAndCalc" type="primary" @click="print">
-        打印
-      </el-button>
-    </div>
-  </div>
-  <div class="calcWaterprices" v-else>
-    <h1>请先查询用户信息</h1>
-  </div>
+      <button class="primary" @click="print(bill.id)">查看通知单</button>
+    </section>
+    <section v-if="user" class="history">
+      <h2>历史通知单</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>月份</th>
+              <th>用量 / m³</th>
+              <th>金额 / 元</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in history" :key="item.id">
+              <td>{{ item.period }}</td>
+              <td>{{ item.totalVolume }}</td>
+              <td>{{ money(item.totalCents) }}</td>
+              <td>
+                <button class="text-button" @click="print(item.id)">
+                  查看 / 补打
+                </button>
+              </td>
+            </tr>
+            <tr v-if="!history.length">
+              <td colspan="4" class="empty">暂无通知单</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
 </template>
-
-<style scoped lang="scss">
-@media (max-width: 768px) {
-  .userInfo {
-    width: 80% !important;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    box-shadow: none !important;
-    border: 1px solid #ebeef570;
-    .fetchUserInfo {
-      width: 100% !important;
-      margin-top: 20px !important;
-      > button {
-        width: 100% !important;
-        height: 40px !important;
-      }
-    }
-  }
-
-  .calcWaterprices {
-    width: 80% !important;
-    // margin-top: 20px;
-    margin-bottom: 20px;
-    box-shadow: none !important;
-    border: 1px solid #ebeef570;
-    margin-left: 0 !important;
-    .calcWaterprice {
-      flex-direction: column !important;
-      height: max-content !important;
-      align-items: center;
-      border-radius: 24px;
-      padding: 5px;
-      > div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100% !important;
-        margin-top: 10px !important;
-        border-radius: 24px;
-      }
-
-      .addWaterPrice {
-        margin-bottom: 20px !important;
-      }
-    }
-  }
-}
-.userInfo {
-  width: 20%;
-  height: 90%;
-  padding: 20px;
-  border-radius: 24px;
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-  background: #fafafa;
-  > div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  label {
-    margin-right: 20px;
-  }
-}
-.calcWaterprices {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  width: 55%;
-  margin-left: 3%;
-  border-radius: 24px;
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-  background: #fafafa;
-  height: 90%;
-  // background: green;
-
-  .calcWaterprice {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    width: 90%;
-    height: 100px;
-    border: 1px solid #efefef;
-    border-radius: 5px;
-
-    label {
-      margin-right: 20px;
-      width: max-content;
-    }
-
-    .waterType {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 30%;
-    }
-
-    .waterNumber {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 25%;
-    }
-
-    .population {
-      display: flex;
-      justify-content: center;
-      width: 20%;
-    }
-
-    .waterPrice {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 20%;
-    }
-
-    .addWaterPrice {
-      display: flex;
-      justify-content: center;
-      width: 5%;
-    }
-  }
-}
-</style>

@@ -3,6 +3,7 @@ import CalcWaterprice from "../views/calcWaterprice.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: "/login", component: () => import("../views/Login.vue") },
     {
       path: "/",
       redirect: "/calc-waterprice",
@@ -28,6 +29,11 @@ const router = createRouter({
       component: () => import("../views/manageInfo.vue"),
     },
   ],
+});
+
+router.beforeEach(to => {
+  if (to.path !== "/login" && !sessionStorage.getItem("waterSession")) return "/login";
+  if (["/manage-info", "/excel-input"].includes(to.path) && sessionStorage.getItem("waterRole") !== "admin") return "/calc-waterprice";
 });
 
 export default router;

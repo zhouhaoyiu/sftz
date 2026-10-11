@@ -1,379 +1,94 @@
-<template>
-  <div>
-    <!-- <div v-for="item in waterPriceList" class="waterPriceItem" :key="item.id">
-    <div>{{ waterType(item.waterType) }}</div>
-    <div>{{ item.waterNumber }}</div>
-  </div> -->
-    <div class="printContent">
-      <canvas id="myCanvas" width="1000" height="700"> </canvas>
-
-      <div class="userHh">
-        {{ query.userHh }}
-      </div>
-      <div class="jfyf">
-        {{ query.jfyf }}
-      </div>
-      <div class="userName">
-        {{ query.userName }}
-      </div>
-      <div class="userAddress">
-        {{ query.userAddress }}
-      </div>
-      <div class="currentNumber">
-        {{ query.currentNumber }}
-      </div>
-      <div class="lastNumber">
-        {{ query.lastNumber }}
-      </div>
-      <div class="userTotalUse">
-        {{ query.userTotalUse }}
-      </div>
-      <div
-        class="userPriceList"
-        v-for="(price, listIndex) in formatWaterPriceList"
-        :style="{
-          left: 250 + listIndex * 80 + 'px',
-        }"
-        :key="listIndex"
-      >
-        <div class="userPriceItemWaterType">
-          {{ price.waterType }}
-        </div>
-
-        <div class="userPriceItemWaterNumber">
-          {{ price.waterNumber }}
-        </div>
-        <div class="userPriceItemWaterUnitPrice">
-          {{ price.waterUnitPrice + "¥" }}
-        </div>
-        <div class="userPriceItemWaterPrice">
-          {{ price.waterPrice + "¥" }}
-        </div>
-        <div class="userPriceItemWaterBornePrice">
-          {{ price.waterBornePrice + "¥" }}
-        </div>
-        <div class="userPriceItemWaterBornePriceTotal">
-          {{ price.waterBornePriceTotal + "¥" }}
-        </div>
-      </div>
-      <!-- 合计 -->
-      <div class="userPriceItemWaterNumberAll">
-        {{
-          NP.strip(
-            formatWaterPriceList.reduce((acc, cur) => acc + cur.waterNumber, 0),
-          )
-        }}
-      </div>
-      <div class="userPriceItemWaterPriceAll">
-        {{
-          NP.strip(
-            formatWaterPriceList.reduce((acc, cur) => acc + cur.waterPrice, 0),
-          ) + "¥"
-        }}
-      </div>
-      <div class="userPriceItemBornePriceAll">
-        {{
-          NP.strip(
-            formatWaterPriceList.reduce(
-              (acc, cur) => acc + cur.waterBornePriceTotal,
-              0,
-            ),
-          ) + "¥"
-        }}
-      </div>
-    </div>
-    <el-button
-      type="primary"
-      style="width: 100%; margin-top: 20px; height: 40px"
-      @click="exportToImage()"
-    >
-      导出
-    </el-button>
-    <el-button
-      v-if="1"
-      type=""
-      style="width: 100%; margin-top: 20px; margin-left: 0px; height: 40px"
-      @click="saveToDb"
-    >
-      保存到数据库
-    </el-button>
-
-    <el-button
-      type="danger"
-      plain
-      style="width: 100%; margin-top: 20px; height: 40px; margin-left: 0"
-      @click="$router.push('/calc-waterprice')"
-    >
-      返回
-    </el-button>
-  </div>
-</template>
-
-<script lang="ts" setup>
-import { onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import {
-  getWaterBornePrice,
-  getWaterPriceUnitPrice,
-  waterTypeEnum,
-} from "./share";
-import sftzd from "../assets/sftzd.jpg";
-import html2canvas from "html2canvas";
-import NP from "number-precision";
-import type { WaterPriceInput } from "@/types/water";
-
-interface FormattedWaterPrice {
-  waterType: string;
-  waterNumber: number;
-  waterUnitPrice: number;
-  waterPrice: number;
-  waterBornePrice: number;
-  waterBornePriceTotal: number;
-}
-
-const $router = useRouter();
-const $route = useRoute();
-
-const query = $route.query;
-
-const formatWaterPriceList: FormattedWaterPrice[] = (
-  JSON.parse(query.waterPriceList as string) as WaterPriceInput[]
-).map((item) => {
-  return {
-    waterType: waterTypeEnum[item.waterType].label,
-    waterNumber: item.waterNumber,
-    // waterPrice: getWaterPriceUnitPrice(item.waterType) * item.waterNumber,
-    waterUnitPrice: getWaterPriceUnitPrice(
-      waterTypeEnum[item.waterType].label,
-      item.waterNumber,
-    ),
-    waterPrice: NP.strip(
-      getWaterPriceUnitPrice(
-        waterTypeEnum[item.waterType].label,
-        item.waterNumber,
-      ) * item.waterNumber,
-    ),
-    waterBornePrice: getWaterBornePrice(waterTypeEnum[item.waterType].label),
-    waterBornePriceTotal: NP.strip(
-      getWaterBornePrice(waterTypeEnum[item.waterType].label) *
-        item.waterNumber,
-    ),
-  };
-});
-
-console.log(JSON.stringify(formatWaterPriceList, null, 2));
-const exportToImage = () => {
-  const div = document.querySelector(".printContent") as HTMLDivElement;
-  html2canvas(div).then((canvas) => {
-    const img = canvas.toDataURL("image/png");
-    const image = new Image();
-    image.src = img;
-    document.body.appendChild(image);
-    const a = document.createElement("a");
-    a.href = img;
-    a.download = `水费通知单-${query.userName}.png`;
-    a.click();
-    document.body.removeChild(image);
-  });
-};
-
-const saveToDb = async () => {
-  const res = await fetch("http://localhost:3000/update_user_by_userHh", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      editUserHh: query.userHh,
-      currentNumber: 0,
-      lastNumber: query.currentNumber,
-    }),
-  });
-  const data = await res.json();
-  if (data.success) {
-    // @ts-ignore
-    ElMessage.success("保存成功");
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { api } from "../api";
+import { type Bill, money } from "../types/bill";
+const route = useRoute(),
+  router = useRouter();
+const bill = ref<Bill | null>(null),
+  error = ref("");
+const printBill = () => window.print();
+onMounted(async () => {
+  if (typeof route.query.id !== "string") {
+    error.value = "缺少通知单编号";
+    return;
   }
-};
-
-onMounted(() => {
-  const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const img = new Image();
-  img.src = sftzd;
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, 1000, 700);
-  };
+  try {
+    bill.value = await api<Bill>(
+      "/billing/bill?id=" + encodeURIComponent(route.query.id),
+    );
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "通知单加载失败";
+  }
 });
 </script>
-
-<style lang="scss" scoped>
-.waterPriceItem {
-  border: 1px solid #000;
-}
-
-.printContent {
-  position: relative;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  height: 700px;
-}
-
-.userHh {
-  position: absolute;
-  top: 87px;
-  left: 190px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.jfyf {
-  position: absolute;
-  top: 90px;
-  left: 550px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.userName {
-  position: absolute;
-  top: 115px;
-  left: 190px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.userAddress {
-  position: absolute;
-  top: 143px;
-  left: 190px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.currentNumber {
-  position: absolute;
-  top: 171px;
-  left: 355px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.lastNumber {
-  position: absolute;
-  top: 198px;
-  left: 355px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.userTotalUse {
-  position: absolute;
-  top: 225px;
-  left: 305px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.userPriceList {
-  position: absolute;
-  top: 290px;
-  left: 250px;
-  // width: 100%;
-  // height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-
-  .userPriceItemWaterType {
-    position: absolute;
-    width: max-content;
-  }
-
-  .userPriceItemWaterNumber {
-    position: absolute;
-    top: 15px;
-    width: max-content;
-  }
-
-  .userPriceItemWaterUnitPrice {
-    position: absolute;
-    top: 42px;
-    width: max-content;
-  }
-
-  .userPriceItemWaterPrice {
-    position: absolute;
-    width: max-content;
-    top: 69px;
-  }
-
-  .userPriceItemWaterBornePrice {
-    position: absolute;
-    width: max-content;
-    top: 154px;
-  }
-
-  .userPriceItemWaterBornePriceTotal {
-    position: absolute;
-    width: max-content;
-    top: 188px;
-  }
-}
-
-.userPriceItemWaterNumberAll {
-  position: absolute;
-  top: 310px;
-  left: 645px;
-  width: max-content;
-  font-weight: bold;
-}
-
-.userPriceItemWaterPriceAll {
-  position: absolute;
-  top: 370px;
-  left: 635px;
-  width: max-content;
-  font-weight: bold;
-}
-
-.userPriceItemBornePriceAll {
-  position: absolute;
-  top: 460px;
-  left: 640px;
-  width: max-content;
-  font-weight: bold;
-}
-</style>
+<template>
+  <section class="print-page">
+    <div class="print-actions">
+      <button @click="router.push('/calc-waterprice')">返回</button
+      ><button class="primary" :disabled="!bill" @click="printBill">
+        打印
+      </button>
+    </div>
+    <p v-if="error" class="error" role="alert">{{ error }}</p>
+    <article v-if="bill" class="notice">
+      <p class="notice-brand">太原供水</p>
+      <h1>水费通知单</h1>
+      <p class="notice-period">{{ bill.period }}</p>
+      <dl class="notice-customer">
+        <dt>户号</dt>
+        <dd>{{ bill.userHh }}</dd>
+        <dt>户名</dt>
+        <dd>{{ bill.userName }}</dd>
+        <dt>地址</dt>
+        <dd>{{ bill.userAddress }}</dd>
+      </dl>
+      <div class="reading-summary">
+        <span
+          >上次读数 <b>{{ bill.lastNumber }}</b></span
+        ><span
+          >本次读数 <b>{{ bill.currentNumber }}</b></span
+        ><span
+          >本期用量 <b>{{ bill.totalVolume }} m³</b></span
+        >
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>用水性质</th>
+              <th>用量 / m³</th>
+              <th>水费 / 元</th>
+              <th>污水费 / 元</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(line, index) in bill.lines" :key="index">
+              <td>{{ line.type }}</td>
+              <td>{{ line.volume }}</td>
+              <td>{{ money(line.waterCents) }}</td>
+              <td>{{ money(line.sewageCents) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="notice-total">
+        合计应收 <strong>¥ {{ money(bill.totalCents) }}</strong>
+      </div>
+      <section class="segments">
+        <h2>计费明细</h2>
+        <p v-for="(line, index) in bill.lines" :key="index">
+          {{ line.type }}：{{
+            line.segments
+              .map((s) => s.volume + " m³ × " + money(s.unitCents) + " 元")
+              .join(" + ")
+          }}
+        </p>
+      </section>
+      <footer class="notice-footer">
+        <span>编号 {{ bill.id }}</span
+        ><span>计价版本 {{ bill.tariffVersion }}</span>
+      </footer>
+    </article>
+  </section>
+</template>

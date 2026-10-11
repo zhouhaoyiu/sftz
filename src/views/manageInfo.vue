@@ -1,555 +1,355 @@
-<template>
-  <div
-    style="width: 100%; height: 100%; display: flex; flex-direction: column"
-    class="page"
-  >
-    <div style="margin-top: 20px">
-      <el-button @click="addUser" type="primary">新建用户</el-button>
-    </div>
-    <el-table
-      class="userInfoTable"
-      align="center"
-      border
-      stripe
-      :data="userInfoArr"
-      style="width: 90%; margin-top: 20px"
-    >
-      <!-- <el-table-column prop="userId" label="ID" width="180"></el-table-column> -->
-      <el-table-column
-        align="center"
-        prop="userHh"
-        label="户号"
-        width="120"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="jfyf"
-        label="缴费月份"
-        width="100"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="userName"
-        label="用户名"
-        width="100"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="userAddress"
-        label="地址"
-        width="100"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="currentNumber"
-        label="本月指数"
-        width="100"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="lastNumber"
-        label="上月指数"
-        width="100"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="userPhone"
-        label="用户电话"
-        width="150"
-      ></el-table-column>
-      <el-table-column
-        align="center"
-        prop="userWx"
-        label="用户微信"
-        width="100"
-      ></el-table-column>
-      <el-table-column align="center" label="用户水性" width="250">
-        <template #default="{ row }">
-          <div v-for="(item, index) in row.waterClassification" :key="index">
-            <span>水性{{ index + 1 }}：</span>
-            <span>{{ item.waterType }}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <span>默认用水量：</span>
-            <span>{{ item.waterNumber }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <!-- 编辑 -->
-      <el-table-column align="center" label="操作">
-        <template #default="{ row }">
-          <el-button type="primary" @click="handleEditUser(row.userHh)">
-            编辑
-          </el-button>
-          <el-button type="danger" @click="handleDeleteUser(row.userHh)">
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-dialog
-      class="dialog"
-      title="新建用户"
-      v-model="addUserDialogVisible"
-      width="60%"
-      top="10vh"
-      :before-close="handleClose"
-    >
-      <div class="dialogDiv">
-        <label for="userHh">户号</label>
-        <el-input
-          id="userHh"
-          v-model="addUserForm.userHh"
-          placeholder="户号"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userName">用户名</label>
-        <el-input
-          id="userName"
-          v-model="addUserForm.userName"
-          placeholder="用户名"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userAddress">地址</label>
-        <el-input
-          id="userAddress"
-          v-model="addUserForm.userAddress"
-          placeholder="地址"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="currentNumber">本月指数</label>
-        <el-input
-          id="currentNumber"
-          v-model="addUserForm.currentNumber"
-          placeholder="用户电话"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="lastNumber">上月指数</label>
-        <el-input
-          id="lastNumber"
-          v-model="addUserForm.lastNumber"
-          placeholder="上月指数"
-        ></el-input>
-      </div>
-      <div
-        style="
-          margin-top: 10px;
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-        "
-      >
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            margin-bottom: 10px;
-            align-items: center;
-          "
-          v-for="(item, index) in addUserForm.waterClassification"
-          :key="index"
-        >
-          <!-- TODO:改为select -->
-          <div>
-            <label for="waterType">水性{{ index + 1 }}</label>
-            <el-select
-              v-model="item.waterType"
-              placeholder="请选择水性"
-              style="width: 300px; padding-right: 14px"
-            >
-              <el-option
-                v-for="item in waterTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-          </div>
-          <div>
-            <label for="waterNumber">默认用水量</label>
-            <el-input
-              id="waterNumber"
-              v-model="item.waterNumber"
-              placeholder="默认用水量"
-              style="width: 300px; padding-right: 14px"
-            ></el-input>
-          </div>
-          <el-button
-            type="danger"
-            @click="handleDeleteSubmitWaterClassification(index)"
-            style="margin-left: 10px"
-          >
-            删除
-          </el-button>
-        </div>
-      </div>
-      <el-button
-        type="primary"
-        @click="handleAddSubmitWaterClassification"
-        style="margin-left: 10px"
-      >
-        添加水性
-      </el-button>
-
-      <div class="dialogDiv">
-        <label for="userPhone">用户电话</label>
-        <el-input
-          id="userPhone"
-          v-model="addUserForm.userPhone"
-          placeholder="用户电话"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userWx">用户微信</label>
-        <el-input
-          id="userWx"
-          v-model="addUserForm.userWx"
-          placeholder="用户微信"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitAddUser"> 确 定 </el-button>
-      </div>
-    </el-dialog>
-    <el-dialog
-      class="dialog"
-      title="编辑"
-      v-model="dialogVisible"
-      width="60%"
-      top="8vh"
-      :before-close="handleClose"
-    >
-      <div class="dialogDiv">
-        <label for="userHh">户号</label>
-        <el-input
-          id="userHh"
-          v-model="editForm.userHh"
-          placeholder="户号"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="jfyf">缴费月份</label>
-        <el-input
-          id="jfyf"
-          v-model="editForm.jfyf"
-          placeholder="缴费月份"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userName">用户名</label>
-        <el-input
-          id="userName"
-          v-model="editForm.userName"
-          placeholder="用户名"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userAddress">地址</label>
-        <el-input
-          id="userAddress"
-          v-model="editForm.userAddress"
-          placeholder="地址"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="currentNumber">本月指数</label>
-        <el-input
-          id="currentNumber"
-          v-model="editForm.currentNumber"
-          placeholder="本月指数"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="lastNumber">上月指数</label>
-        <el-input
-          id="lastNumber"
-          v-model="editForm.lastNumber"
-          placeholder="上月指数"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <label for="userPhone">用户电话</label>
-        <el-input
-          id="userPhone"
-          v-model="editForm.userPhone"
-          placeholder="用户电话"
-        ></el-input>
-      </div>
-      <!-- {{ editForm }} -->
-      <div
-        class="dialogDiv"
-        style="display: flex; flex-direction: column; width: 100%"
-      >
-        <div
-          style="
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            margin-bottom: 10px;
-            align-items: center;
-          "
-          v-for="(item, index) in editForm.waterClassification"
-          :key="index"
-        >
-          <label style="padding-right: 14px" for="waterType">
-            水性{{ index + 1 }}
-          </label>
-          <!-- TODO:改为select -->
-          <!-- <el-input
-            id="waterType"
-            v-model="item.waterType"
-            placeholder="水性"
-            style="width: 300px; padding-right: 14px"
-          ></el-input> -->
-          <el-select
-            v-model="item.waterType"
-            placeholder="请选择水性"
-            style="width: 300px; padding-right: 14px"
-          >
-            <el-option
-              v-for="item in waterTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          <label style="padding-right: 14px" for="waterNumber">
-            默认用水量
-          </label>
-          <el-input
-            id="waterNumber"
-            v-model="item.waterNumber"
-            placeholder="默认用水量"
-            style="width: 300px"
-          ></el-input>
-          <el-button
-            type="danger"
-            @click="handleDeleteWaterClassification(index)"
-            style="margin-left: 10px"
-          >
-            删除
-          </el-button>
-        </div>
-        <el-button
-          type="primary"
-          @click="handleAddWaterClassification"
-          style="margin-left: 10px"
-        >
-          添加
-        </el-button>
-      </div>
-      <div class="dialogDiv">
-        <label for="userWx">用户微信</label>
-        <el-input
-          id="userWx"
-          v-model="editForm.userWx"
-          placeholder="用户微信"
-        ></el-input>
-      </div>
-      <div class="dialogDiv">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleChangeInfo"> 确 定 </el-button>
-      </div>
-    </el-dialog>
-  </div>
-</template>
-<!-- eslint-disable no-undef -->
-<script lang="ts" setup>
-// import { ElMessage } from "element-plus";
-import { dayjs } from "element-plus";
-import { waterTypeOptions } from "./share";
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
+import { Plus, Pencil, Archive, RefreshCw, X } from "@lucide/vue";
+import { api } from "../api";
 import {
   parseWaterClassifications,
-  type ApiResponse,
-  type EditableUser,
-  type EditableUserPayload,
-} from "@/types/water";
-
-import { onMounted, ref, type Ref } from "vue";
-let editHh: Ref<string> = ref("");
-let userInfoArr = ref<EditableUser[]>([]);
-let dialogVisible: Ref<boolean> = ref(false);
-let addUserDialogVisible: Ref<boolean> = ref(false);
-let addUserForm = ref<EditableUser>({
-  userHh: "",
-  jfyf: "",
-  userName: "",
-  userAddress: "",
-  currentNumber: "",
-  lastNumber: "",
-  userPhone: "",
-  userWx: "",
-  waterClassification: [],
-});
-let editForm = ref<EditableUser>({
-  userHh: "",
-  jfyf: "",
-  userName: "",
-  userAddress: "",
-  currentNumber: "",
-  lastNumber: "",
-  userPhone: "",
-  userWx: "",
-  waterClassification: [
-    {
-      waterType: "生活一",
-      waterNumber: "0",
-    },
-  ],
-});
-
-let addUser = () => {
-  addUserDialogVisible.value = true;
-};
-
-let submitAddUser = async () => {
-  const sendData = {
-    ...addUserForm.value,
-    waterClassification: JSON.stringify(addUserForm.value.waterClassification),
-    jfyf: dayjs().format("YYYY-MM"),
+  type WaterClassification,
+} from "../types/water";
+interface Customer {
+  userHh: string;
+  userName: string;
+  userAddress: string;
+  userPhone: string;
+  userWx: string;
+  jfyf: string;
+  currentNumber: number;
+  lastNumber: number;
+  userPopulation: number;
+  version: number;
+  waterClassification: WaterClassification[] | string;
+}
+const rows = ref<Customer[]>([]),
+  search = ref(""),
+  loading = ref(false),
+  saving = ref(false),
+  error = ref("");
+const categories = ref<string[]>([]),
+  dialog = ref<HTMLDialogElement>(),
+  editing = ref(false);
+const form = ref<Customer & { waterClassification: WaterClassification[] }>(
+  blank(),
+);
+const page = ref(1);
+function blank() {
+  return {
+    userHh: "",
+    userName: "",
+    userAddress: "",
+    userPhone: "",
+    userWx: "",
+    jfyf: "",
+    currentNumber: 0,
+    lastNumber: 0,
+    userPopulation: 3,
+    version: 1,
+    waterClassification: [] as WaterClassification[],
   };
-  console.log(addUserForm.value);
+}
+const filtered = computed(() =>
+  rows.value.filter((row) =>
+    [row.userHh, row.userName, row.userAddress].some((value) =>
+      value.includes(search.value.trim()),
+    ),
+  ),
+);
+const pages = computed(() =>
+  Math.max(1, Math.ceil(filtered.value.length / 20)),
+);
+const visible = computed(() =>
+  filtered.value.slice(
+    (Math.min(page.value, pages.value) - 1) * 20,
+    Math.min(page.value, pages.value) * 20,
+  ),
+);
+async function load() {
+  loading.value = true;
+  error.value = "";
   try {
-    const res = await fetch("http://192.168.88.109:7001/user/create_user", {
+    rows.value = await api<Customer[]>("/user/get_all_user");
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "档案加载失败";
+  } finally {
+    loading.value = false;
+  }
+}
+function open(row?: Customer) {
+  error.value = "";
+  editing.value = !!row;
+  form.value = row
+    ? {
+        ...JSON.parse(JSON.stringify(row)),
+        waterClassification: parseWaterClassifications(
+          row.waterClassification,
+        ).map((item) => ({ ...item, waterNumber: Number(item.waterNumber) })),
+      }
+    : blank();
+  dialog.value?.showModal();
+}
+async function save() {
+  if (saving.value) return;
+  if (form.value.currentNumber < form.value.lastNumber) {
+    error.value = "本次读数不能小于上次读数";
+    return;
+  }
+  saving.value = true;
+  error.value = "";
+  try {
+    const value = {
+      ...form.value,
+      waterClassification: form.value.waterClassification.map((item) => ({
+        ...item,
+        waterNumber: Number(item.waterNumber),
+      })),
+    };
+    const saved = await api<Customer>(
+      editing.value ? "/user/update_user_by_userHh" : "/user/create_user",
+      { method: "POST", body: JSON.stringify(value) },
+    );
+    rows.value = [
+      saved,
+      ...rows.value.filter((row) => row.userHh !== saved.userHh),
+    ];
+    dialog.value?.close();
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "保存失败，表单已保留";
+  } finally {
+    saving.value = false;
+  }
+}
+async function archive(row: Customer) {
+  const reason = window.prompt("归档 " + row.userHh + " 的原因");
+  if (!reason?.trim() || saving.value) return;
+  saving.value = true;
+  error.value = "";
+  try {
+    await api("/user/delete_user_by_userHh", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(sendData),
+      body: JSON.stringify({
+        userHh: row.userHh,
+        version: row.version,
+        reason: reason.trim(),
+      }),
     });
-    const data = (await res.json()) as ApiResponse<unknown>;
-    console.log(data.data);
-    if (data.success) {
-      // @ts-ignore
-      ElMessage.success("新增用户成功");
-      addUserDialogVisible.value = false;
-    } else {
-      // @ts-ignore
-      ElMessage.error("新增用户失败");
-    }
-  } catch (error) {
-    // @ts-ignore
-    ElMessage.error("新增用户失败");
+    rows.value = rows.value.filter((item) => item.userHh !== row.userHh);
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : "归档失败";
+  } finally {
+    saving.value = false;
   }
-};
-
+}
 onMounted(async () => {
+  await load();
   try {
-    const res = await fetch("http://192.168.88.109:7001/user/get_all_user");
-    const data = (await res.json()) as ApiResponse<EditableUserPayload[]>;
-    console.log(data.data);
-    userInfoArr.value = data.data.map((item) => ({
-      ...item,
-      waterClassification: parseWaterClassifications(item.waterClassification),
-    }));
-  } catch (error) {
-    // @ts-ignore
-    ElMessage.error("获取用户信息失败");
+    categories.value = (
+      await api<{ categories: string[] }>("/billing/tariffs")
+    ).categories;
+  } catch {
+    error.value = "用水分类加载失败";
   }
 });
-
-const handleEditUser = (userHh: string) => {
-  editHh.value = userHh;
-  dialogVisible.value = true;
-
-  userInfoArr.value.forEach((item) => {
-    if (item.userHh === userHh) {
-      editForm.value = item;
-    }
-  });
-};
-
-const handleClose = (done: () => void) => {
-  done();
-};
-
-const defaultWaterNumber = 0;
-
-const handleAddWaterClassification = () => {
-  editForm.value.waterClassification.push({
-    waterType: "",
-    waterNumber: defaultWaterNumber,
-  });
-};
-
-const handleAddSubmitWaterClassification = () => {
-  addUserForm.value.waterClassification.push({
-    waterType: "",
-    waterNumber: defaultWaterNumber,
-  });
-};
-
-const handleDeleteUser = (userHh: string) => {
-  console.log(userHh);
-};
-
-const handleChangeInfo = async () => {
-  // console.log(JSON.stringify(editForm.value.waterClassification));
-  const sendData = {
-    ...editForm.value,
-    waterClassification: JSON.stringify(editForm.value.waterClassification),
-    editUserHh: editHh.value,
-  };
-  const changeRes = await fetch(
-    "http://192.168.88.109:7001/user/update_user_by_userHh",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(sendData),
-    },
-  );
-  const changeData = (await changeRes.json()) as ApiResponse<unknown>;
-  console.log(changeData);
-  if (changeData.success) {
-    // @ts-ignore
-    ElMessage.success("修改成功");
-    dialogVisible.value = false;
-  } else {
-    // @ts-ignore
-    ElMessage.error("修改失败");
-  }
-};
-
-const handleDeleteWaterClassification = (index: number) => {
-  editForm.value.waterClassification.splice(index, 1);
-};
-
-const handleDeleteSubmitWaterClassification = (index: number) => {
-  addUserForm.value.waterClassification.splice(index, 1);
-};
 </script>
-
-<style lang="scss" scoped>
-.dialog {
-  display: flex;
-  flex-direction: column;
-
-  // width: 100%;
-  label {
-    padding-right: 14px;
-  }
-
-  .dialogDiv {
-    margin-top: 10px;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .userInfoTable {
-    width: 95% !important;
-  }
-
-  .page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-}
-</style>
+<template>
+  <section>
+    <header class="page-top">
+      <div>
+        <p class="eyebrow">营业业务</p>
+        <h1>客户档案</h1>
+      </div>
+      <button class="primary" @click="open()" :disabled="saving">
+        <Plus :size="17" />新建客户
+      </button>
+    </header>
+    <p v-if="error && !dialog?.open" role="alert" class="error">{{ error }}</p>
+    <div class="customer-tools">
+      <input
+        v-model="search"
+        @input="page = 1"
+        aria-label="搜索客户"
+        placeholder="户号、户名或地址"
+      /><span class="muted">{{ filtered.length }} 户</span
+      ><button
+        @click="load"
+        :disabled="loading"
+        aria-label="刷新客户"
+        title="刷新客户"
+      >
+        <RefreshCw :size="17" />
+      </button>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>户号</th>
+            <th>户名</th>
+            <th>地址</th>
+            <th>上次 / 本次读数</th>
+            <th>人口</th>
+            <th>联系电话</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in visible" :key="row.userHh">
+            <td>{{ row.userHh }}</td>
+            <td>{{ row.userName }}</td>
+            <td>{{ row.userAddress }}</td>
+            <td>{{ row.lastNumber }} / {{ row.currentNumber }}</td>
+            <td>{{ row.userPopulation }}</td>
+            <td>{{ row.userPhone || "—" }}</td>
+            <td class="row-actions">
+              <button
+                @click="open(row)"
+                :disabled="saving"
+                :aria-label="'编辑 ' + row.userHh"
+                title="编辑"
+              >
+                <Pencil :size="16" /></button
+              ><button
+                @click="archive(row)"
+                :disabled="saving"
+                :aria-label="'归档 ' + row.userHh"
+                title="归档"
+              >
+                <Archive :size="16" />
+              </button>
+            </td>
+          </tr>
+          <tr v-if="!visible.length">
+            <td colspan="7" class="empty">
+              {{ loading ? "正在加载" : "暂无客户" }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <button @click="page--" :disabled="page <= 1">上一页</button
+      ><span>{{ Math.min(page, pages) }} / {{ pages }}</span
+      ><button @click="page++" :disabled="page >= pages">下一页</button>
+    </div>
+    <dialog
+      ref="dialog"
+      class="customer-dialog"
+      @cancel="saving && $event.preventDefault()"
+    >
+      <header>
+        <h2>{{ editing ? "编辑客户" : "新建客户" }}</h2>
+        <button
+          @click="dialog?.close()"
+          :disabled="saving"
+          aria-label="关闭"
+          title="关闭"
+        >
+          <X :size="19" />
+        </button>
+      </header>
+      <form @submit.prevent="save">
+        <fieldset :disabled="saving">
+          <div class="customer-fields">
+            <label
+              >户号<input
+                v-model.trim="form.userHh"
+                :readonly="editing"
+                required
+                maxlength="128" /></label
+            ><label
+              >户名<input v-model.trim="form.userName" required maxlength="128"
+            /></label>
+            <label class="wide"
+              >地址<input
+                v-model.trim="form.userAddress"
+                required
+                maxlength="500"
+            /></label>
+            <label
+              >上次读数<input
+                v-model.number="form.lastNumber"
+                type="number"
+                min="0"
+                max="1000000000"
+                step="0.001"
+                required /></label
+            ><label
+              >本次读数<input
+                v-model.number="form.currentNumber"
+                type="number"
+                :min="form.lastNumber"
+                max="1000000000"
+                step="0.001"
+                required
+            /></label>
+            <label
+              >人口<input
+                v-model.number="form.userPopulation"
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                required /></label
+            ><label>计费月份<input v-model="form.jfyf" type="month" /></label>
+            <label
+              >联系电话<input
+                v-model.trim="form.userPhone"
+                type="tel"
+                maxlength="64" /></label
+            ><label
+              >微信<input v-model.trim="form.userWx" maxlength="128"
+            /></label>
+          </div>
+          <h3>默认用水分类</h3>
+          <div
+            v-for="(item, index) in form.waterClassification"
+            :key="index"
+            class="classification-row"
+          >
+            <label
+              >水性<select v-model="item.waterType" required>
+                <option v-for="category in categories" :key="category">
+                  {{ category }}
+                </option>
+              </select></label
+            >
+            <label
+              >用量 / m³<input
+                v-model.number="item.waterNumber"
+                type="number"
+                min="0"
+                max="10000000"
+                step="0.001"
+                required
+            /></label>
+            <button
+              type="button"
+              @click="form.waterClassification.splice(index, 1)"
+              :aria-label="'移除分类 ' + (index + 1)"
+              title="移除"
+            >
+              <X :size="16" />
+            </button>
+          </div>
+          <button
+            type="button"
+            @click="
+              form.waterClassification.push({
+                waterType: categories[0],
+                waterNumber: 0,
+              })
+            "
+            :disabled="
+              !categories.length || form.waterClassification.length >= 20
+            "
+          >
+            <Plus :size="16" />添加分类
+          </button>
+          <p v-if="error" class="error" role="alert">{{ error }}</p>
+          <footer>
+            <button type="button" @click="dialog?.close()">取消</button
+            ><button class="primary">{{ saving ? "正在保存" : "保存" }}</button>
+          </footer>
+        </fieldset>
+      </form>
+    </dialog>
+  </section>
+</template>

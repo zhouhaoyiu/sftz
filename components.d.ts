@@ -12,15 +12,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ElButton: typeof import('element-plus/es')['ElButton']
-    ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
-    ElDialog: typeof import('element-plus/es')['ElDialog']
-    ElInput: typeof import('element-plus/es')['ElInput']
-    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
-    ElOption: typeof import('element-plus/es')['ElOption']
-    ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElTable: typeof import('element-plus/es')['ElTable']
-    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     LeftBar: typeof import('./src/components/leftBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -29,15 +20,6 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
-  const ElButton: typeof import('element-plus/es')['ElButton']
-  const ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
-  const ElDialog: typeof import('element-plus/es')['ElDialog']
-  const ElInput: typeof import('element-plus/es')['ElInput']
-  const ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
-  const ElOption: typeof import('element-plus/es')['ElOption']
-  const ElSelect: typeof import('element-plus/es')['ElSelect']
-  const ElTable: typeof import('element-plus/es')['ElTable']
-  const ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
   const LeftBar: typeof import('./src/components/leftBar.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
