@@ -18,7 +18,7 @@
     "html2canvas": "^1.4.1",
     "number-precision": "^1.6.0",
     "pinia": "^4.1.0",
-    "read-excel-file": "^9.3.14",
+    "read-excel-file": "^9.3.17",
     "vue": "^3.5.45",
     "vue-router": "^5.5.0"
   },
